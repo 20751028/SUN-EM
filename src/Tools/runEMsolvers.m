@@ -33,6 +33,11 @@ function [Solution] = runEMsolvers(Const, Solver_setup, zMatrices, yVectors, xVe
     if (Const.runMoMsolver)        
         Solution.mom = runMoMsolver(Const, Solver_setup, zMatrices, yVectors, xVectors);
     end%if
+    
+     % -- PO    
+    if (Const.runPOsolver)        
+        Solution.PO = runPOsolver(Const, Solver_setup, zMatrices, yVectors, xVectors);
+    end%if
 
     % -- C++ MoM (TO-DO: Tameez, perhaps this is a better spot to call your entire MoM C++ solver)
     % if (Const.runMoMsolver)        

@@ -1,27 +1,26 @@
-FEKO      Version 2017.2.4-545 from 2017-11-20
-          PREFEKO Version 2017.2.3-39 from 2017-08-21 [FEK: default 158; used 158] BINARY
-          CADFEKO version 2017.2.3-312190 (x64) from 2017-10-25                           
+Altair Feko - Solver (seq) Version 2019.1-338 from 2019-06-07
+          Altair Feko - PREFEKO Version 2019.1-48 from 2019-03-29 [FEK: default 166; used 166] BINARY
+          CADFEKO version 2019.1-353059 (x64) from 2019-06-20
           Copyright (c) 1999-2014 Altair Development S.A. (Pty) Ltd
-          Copyright (c) 2014-2017 Altair Engineering, Inc.
-          Intel(R) MKL version 11.3.4 (build 20160823) on Intel(R) Advanced Vector Extensions (Intel(R) AVX) enabled processors, Intel(R) 64 architecture (1 thread)
-Computer: PC WIN64 EM64T MKL -- DESKTOP-EF1JMGI
-          Microsoft Windows 8.1 Enterprise Edition  (Build 9600), Version 6.3.9600 x64 (SP 0.0)
-          Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz; GenuineIntel family 6 model 10 stepping 7 brand id 0
-          1 physical CPU with a total of 4 processors found (multi-core CPU with max. 4 cores per physical CPU)
+          Copyright (c) 2014-2019 Altair Engineering, Inc.
+          Intel(R) MKL version 2018.0.4 (build 20180808) on Intel(R) Advanced Vector Extensions 2 (Intel(R) AVX2) enabled processors, Intel(R) 64 architecture (1 thread)
+Computer: PC WIN64 EM64T MKL -- MSI
+          Microsoft Windows 10 vNEXT  (Build 18363), Version 10.0.18363 x64 (SP 0.0)
+          Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz; GenuineIntel family 6 model 14 stepping 9 brand id 0
+          1 physical CPU with a total of 8 processors found (multi-core CPU with max. 4 cores per physical CPU)
 Threads:  OpenMP threading not used
-Date:     2018-06-05 08:21:48                     
+Date:     2020-08-13 12:54:42                     
 File:     pec_plate_array
-Memory:   Unlimited, system allows maximum usage of 7.714 GByte
-          (installed memory 7.910 GByte, thereof free 1.952 GByte)
-MD5 Check:5B2F65D60F8CCB8DAAD11B41C8C73B37
-MD5 Total:61F6808FD60BA9105BB5B47E4894DD38
+Memory:   Unlimited, system allows maximum usage of 15.693 GByte
+          (installed memory 15.888 GByte, thereof free 2.647 GByte)
+MD5 Check:A72014FF3A42874BF4FF0164B6B7D51C
+MD5 Total:5B724C8675C1F3DE9E2DF48346C76B3B
  Licence:  Altair HyperWorks
 
- NOTE    35127: You are running a sequential version of FEKO, but it was detected that your CPU has more than one core. For best performance, it would be recommended to run the parallel FEKO kernel (your licence allows this)
+ NOTE    35127: You are running a sequential version of Altair Feko, but it was detected that your machine has more than one core. For best performance, it would be recommended to run the parallel Feko Solver
+ NOTE    35179: Compatible graphics card (GPU) found on this machine for possible hardware acceleration (your Feko license allows GPU usage). Please use the command line option --use-gpu to use or enable the checkbox in the GUI
 
-SPICE
-  Engine:      NGSPICE
-  Executable:  C:\Program Files\Altair\2017\feko\bin\vngspicec.exe
+Spice Engine:  HyperSpice Version 2018-19795 from 2018-10-19
 
 
                          CREATING THE FINITE ARRAY GEOMETRY
@@ -258,7 +257,7 @@ SPICE
 
                          DATA OF THE METALLIC EDGES (with MoM)
 
-                                            triangle no.    points of tr.     information on symmetry
+                                            triangle no.   points of tr.     information on symmetry
     no.  type      length/m        media     KORP   KORM   POIP   POIM      yz     xz     xy  status
         1   1    4.7140E-01  Free s     -1      1     15      3      2       0      0      0  unknown  
         2   1    4.7140E-01  Free s     -1      2      6      1      1       0      0      0  unknown  
@@ -331,6 +330,17 @@ SPICE
        69   1    4.4479E-01  Free s     -1     52     54      3      2       0      0      0  unknown  
 
 
+                    DATA OF TRIANGLE MESH RULES
+
+                                Area/lambda^2 limits
+          Basis function order   warning      error
+              RWG                 0.033       0.100
+              0.5                 0.033       0.100
+              1.5                 0.210       0.520
+              2.5                 0.620       1.400
+              3.5                 0.970       2.100
+
+
                                 DATA FOR MEMORY USAGE
 
  Number of metallic triangles:              54                                max. triangles:    MAXNDR    =       54
@@ -369,7 +379,7 @@ SPICE
  Number of dielectric faces (VEP):           0  unknown:        0
  Number of magnetic faces (VEP):             0  unknown:        0
 
- Number of basis funct. for MoM:            69  unknown:       69             max. basisf.       MAXNZEILE =       81
+ Number of basis funct. for MoM:            69  unknown:       69             max. basisf.       MAXNZEILE =       69
  Number of basis funct. for PO:              0  unknown:        0             max. basisf.       MAXNKAPO  =        0
 
  read from input file:
@@ -383,7 +393,7 @@ PW       0    0    0    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
 A0       0    0    1    1    1 1.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
-FR       0    0    0    0    0 2.998E+08 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
+FR       0    0    0    0    0 2.998E+08 0.000E+00 2.998E+08 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
 NC       0    0    0    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
@@ -407,7 +417,7 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
 
 
 
-               EXCITATION BY INCIDENT PLANE ELECTROMAGNETIC WAVE 
+                    EXCITATION BY INCIDENT PLANE ELECTROMAGNETIC WAVE
 
  Name:                          PlaneWaveSource1
  Excitation index:              1
@@ -417,10 +427,11 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
  Polarisation:                  LINEAR
  Axial ratio:                   V =      0.0000
  Polarisation angle:            ETA =    0.00
- Direction of propag.:          BETA0X =  0.00000E+00
+ Direction of propagation:      BETA0X =  0.00000E+00
    (unit vector)                BETA0Y =  0.00000E+00
                                 BETA0Z = -1.00000E+00
  Wave number:                   BETA0  = ( 6.28319E+00 +j 0.00000E+00)
+ Phase reference point in m:    x =  0.00000E+00, y =  0.00000E+00, z =  0.00000E+00
  Field strength in V/m:         |E0X| =  1.00000E+00   ARG(E0X) =   180.00
    (Phase in degrees)           |E0Y| =  0.00000E+00   ARG(E0Y) =     0.00
                                 |E0Z| =  0.00000E+00   ARG(E0Z) =     0.00
@@ -465,16 +476,16 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
                All segments and triangles are perfectly conducting.
 
 
-                          DATA FOR STORAGE OF THE MATRIX
+               DATA FOR STORAGE OF THE MATRIX
 
  Storage using double precision
 
- Memory requirement for MoM matrix:        80 rows *       69 columns =        5520 complex numbers
- For the MoM matrix, a memory of         5520 complex numbers is used (i.e. 86.250 kByte)
+ Memory requirement for MoM matrix: 80 rows * 69 columns = 5520 complex numbers
+ For the MoM matrix, a memory of 5520 complex numbers is used (i.e. 86.250 kByte)
  Storing the matrix and solving the linear set of equations in main memory (storage scheme 1)
 
-     A total of 136.764 kByte of memory has been allocated dynamically
-     (peak memory usage of 136.764 kByte so far)
+     A total of 154.119 kByte of memory has been allocated dynamically
+     (peak memory usage of 154.119 kByte so far)
 
 
 
@@ -485,14 +496,15 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
      CPU time for preconditioning:       0.000 seconds
 
 
-                    SOLUTION OF THE LINEAR SET OF EQUATIONS WITH LAPAGAU
+               SOLUTION OF THE LINEAR SET OF EQUATIONS WITH LAPAGAU
 
                Condition number of the matrix:  1.24457E+02
 
                Floating point performance for LU decomposition:
-                    Not determined since computation time too short
+                             4.395 MFLOPS(DP) for CPU-time       0.207 seconds
+                             4.395 MFLOPS(DP) for run-time       0.207 seconds
 
-     CPU time for solving the linear set of equations:       0.005 seconds
+     CPU time for solving the linear set of equations:       0.337 seconds
 
 
  Current request with name: Currents1
@@ -533,19 +545,19 @@ EN       0    0    0    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
                     SUMMARY OF REQUIRED TIMES IN SECONDS
 
                                              CPU-time       runtime
- Reading and constructing the geometry          0.009         0.009
+ Reading and constructing the geometry          0.066         0.066
  Checking the geometry                          0.000         0.000
  Initialisation of the Green's function         0.000         0.000
  Calcul. of coupling for PO/Fock                0.000         0.000
  Transformation to equivalent sources           0.000         0.000
  Ray launching/tracing phase of RL-GO           0.000         0.000
- Calcul. of matrix elements                     0.016         0.016
- Calcul. of right-hand side vector              0.002         0.002
+ Calcul. of matrix elements                     0.096         0.096
+ Calcul. of right-hand side vector              0.011         0.011
  Preconditioning system of linear eqns.         0.000         0.000
- Solution of the system of linear eqns.         0.005         0.005
- Eigensolution for characteristic modes         0.000         0.000
- Determination of surface currents              0.003         0.003
- Calcul. of impedances/powers/losses            0.008         0.008
+ Solution of the system of linear eqns.         0.337         0.337
+ Calcul. of characteristic modes                0.000         0.000
+ Determination of surface currents              0.001         0.001
+ Calcul. of impedances/powers/losses            0.034         0.034
  Calcul. of averaged SAR values                 0.000         0.000
  Calcul. of power receiving antenna             0.000         0.000
  Calcul. of cable coupling                      0.000         0.000
@@ -553,11 +565,11 @@ EN       0    0    0    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  Calcul. of electric near field                 0.000         0.000
  Calcul. of magnetic near field                 0.000         0.000
  Calcul. of far field                           0.000         0.000
-                            other               0.094         0.094
+                            other               0.539         0.539
                                          ------------  ------------
-                         total times:           0.137         0.137
+                         total times:           1.084         1.084
                (total times in hours:           0.000         0.000)
 
- Peak memory usage during the whole solution: 147.543 kByte
+ Peak memory usage during the whole solution: 164.898 kByte
 
-Finished: 2018-06-05 08:21:48                     
+Finished: 2020-08-13 12:54:43                     

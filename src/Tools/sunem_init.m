@@ -51,6 +51,19 @@ function Const = sunem_init(Const, yVectors)
            Const.runMoMsolver = false;
         end
     end
+        % ================================    
+    try
+        set = false;
+        if (Const.runPOsolver)
+            % It is set in the driver
+            set = true;
+        end
+    catch
+        if (~set)
+            % Solver not activated
+           Const.runPOsolver = false;
+        end
+    end
     
    % ================================    
     try

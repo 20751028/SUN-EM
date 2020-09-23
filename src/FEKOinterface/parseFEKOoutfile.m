@@ -63,6 +63,7 @@ function [Const, FEKO_data] = parseFEKOoutfile(Const, yVectors)
 
     % Initialise some basis function related information
     FEKO_data.num_metallic_edges = 0;              % For RWG BFs
+    FEKO_data.num_metallic_edges_po = 0;
     FEKO_data.number_nodes_between_segments = 0;   % For wire (rooftop?) BFs
     
     % A local debug flag (e.g. to plot geometry)
@@ -133,6 +134,15 @@ function [Const, FEKO_data] = parseFEKOoutfile(Const, yVectors)
             FEKO_data.num_metallic_edges = str2num(edge_line_info{7});
         end%if
 
+        % -------------------------------------------------
+        % -- Parse the number of metallic edges (PO)
+        g = strfind(line,'Number of metallic edges (PO):'); 
+        if (g > 0)
+            edge_line_info = strsplit(line);
+            FEKO_data.num_metallic_edges_po = str2num(edge_line_info{7});
+        end%if
+        
+        FEKO_data.num_metallic_edges = max(FEKO_data.num_metallic_edges_po,  FEKO_data.num_metallic_edges);
         % See GitHub issue #2 : Adding now support for parsing wire segments
  
         % -------------------------------------------------
@@ -388,8 +398,16 @@ function [Const, FEKO_data] = parseFEKOoutfile(Const, yVectors)
                     
                     rwg_bf_type = str2num(rwg_bf_data{3});
                     % At the moment, we only allow Type 1 BFs, i.e. RWG elements spanning
-                    % the shared edge between two triangles
-                    if (rwg_bf_type > 1)
+                    % the shared edge between two triangles. Type 11 BFs
+                    % can also be allowed and are used for FEKO's PO
+                    % solver.
+                    %Type 12 BFs are half BFs used by FEKO for PO.
+                    %TODO: Include half BFs for better accuracy - Currently we ignore these BFs.
+                    if (rwg_bf_type == 12)
+                            FEKO_data.num_metallic_edges = ii-1;
+                            break
+                    end
+                    if (rwg_bf_type > 1 && rwg_bf_type ~= 11)
                         message_fc(Const,sprintf('Only RWG basis functions supported'));
                         error(['Only RWG basis functions supported']);
                     end%if
@@ -399,6 +417,7 @@ function [Const, FEKO_data] = parseFEKOoutfile(Const, yVectors)
                     
                     % Extract the Tm+ triangle (KORP in FEKO) [m]
                     FEKO_data.rwg_basis_functions_trianglePlus(rwg_bf_id) = str2num(rwg_bf_data{8});
+                   
                     
                     % Extract the Tm- triangle (KORM in FEKO) [m]
                     FEKO_data.rwg_basis_functions_triangleMinus(rwg_bf_id) = str2num(rwg_bf_data{9});

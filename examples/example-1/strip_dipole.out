@@ -1,27 +1,32 @@
-FEKO      Version 2017.2.3-538 from 2017-10-27
-          PREFEKO Version 2017.2.3-39 from 2017-08-21 [FEK: default 158; used 158] BINARY
-          CADFEKO version unknown                                                         
+Altair Feko - Solver (par) Version 2019.1-338 from 2019-06-07
+          Altair Feko - PREFEKO Version 2019.1-48 from 2019-03-29 [FEK: default 166; used 166] BINARY
+          CADFEKO version unknown
           Copyright (c) 1999-2014 Altair Development S.A. (Pty) Ltd
-          Copyright (c) 2014-2017 Altair Engineering, Inc.
-          Intel(R) MKL version 11.3.4 (build 20160823) on Intel(R) Advanced Vector Extensions 2 (Intel(R) AVX2) enabled processors, Intel(R) 64 architecture (1 thread)
-Computer: PC LINUX EM64T MKL -- DLUDICK-W540
-          Linux x86_64 4.4.0-121-generic
-          Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz; GenuineIntel family 6 model 12 stepping 3 brand id 0
+          Copyright (c) 2014-2019 Altair Engineering, Inc.
+          Intel(R) MKL version 2018.0.4 (build 20180808) on Intel(R) Advanced Vector Extensions 2 (Intel(R) AVX2) enabled processors, Intel(R) 64 architecture (1 thread)
+Computer: PC WIN64 EM64T MKL IMPI -- MSI
+          Microsoft Windows 10 vNEXT  (Build 18363), Version 10.0.18363 x64 (SP 0.0)
+          Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz; GenuineIntel family 6 model 14 stepping 9 brand id 0
           1 physical CPU with a total of 8 processors found (multi-core CPU with max. 4 cores per physical CPU)
 Threads:  OpenMP threading not used
-Date:     2018-05-27 13:17:39                     
+Date:     2020-07-20 13:43:57                     
 File:     strip_dipole
-Memory:   Unlimited, system allows maximum usage of 15.104 GByte
-          (installed memory 15.299 GByte, thereof free 248.266 MByte)
+Memory:   Unlimited, system allows maximum usage of 3.922 GByte
+          (for parallel runs memory limit is per process)
+          (installed memory 15.884 GByte, thereof free 8.329 GByte)
 MD5 Check:17D62AEE237187D6FBFC9D3D6C4DE96D
 MD5 Total:40F7C453A360AD27BA455E17A64B8543
  Licence:  Altair HyperWorks
 
- NOTE    35127: You are running a sequential version of FEKO, but it was detected that your CPU has more than one core. For best performance, it would be recommended to run the parallel FEKO kernel (your licence allows this)
+Number of parallel processes:     4 on 1 CPUs
 
-SPICE
-  Engine:      NGSPICE
-  Executable:  /home/dludick/altair/2017/altair/feko/bin/ngspice
+Master process    0 on machine: MSI                            using 1 threads
+Server process    1 on machine: MSI                            using 1 threads
+Server process    2 on machine: MSI                            using 1 threads
+Server process    3 on machine: MSI                            using 1 threads
+
+
+Spice Engine:  HyperSpice Version 2018-19795 from 2018-10-19
 
           Surface of all triangles in m*m:     9.00000E-03
 
@@ -148,7 +153,7 @@ SPICE
 
                          DATA OF THE METALLIC EDGES (with MoM)
 
-                                            triangle no.    points of tr.     information on symmetry
+                                            triangle no.   points of tr.     information on symmetry
     no.  type      length/m        media     KORP   KORM   POIP   POIM      yz     xz     xy  status
         1   1    3.7857E-02  Free s     -1      1      2      1      1       0      0      0  unknown  
         2   1    2.0000E-02  Free s     -1      2      3      3      3       0      0      0  unknown  
@@ -177,6 +182,17 @@ SPICE
        25   1    3.7857E-02  Free s     -1     25     26      1      1       0      0      0  unknown  
        26   1    2.0000E-02  Free s     -1     26     27      3      3       0      0      0  unknown  
        27   1    3.7857E-02  Free s     -1     27     28      1      1       0      0      0  unknown  
+
+
+                    DATA OF TRIANGLE MESH RULES
+
+                                Area/lambda^2 limits
+          Basis function order   warning      error
+              RWG                 0.033       0.100
+              0.5                 0.033       0.100
+              1.5                 0.210       0.520
+              2.5                 0.620       1.400
+              3.5                 0.970       2.100
 
 
                                 DATA FOR MEMORY USAGE
@@ -217,13 +233,13 @@ SPICE
  Number of dielectric faces (VEP):           0  unknown:        0
  Number of magnetic faces (VEP):             0  unknown:        0
 
- Number of basis funct. for MoM:            27  unknown:       27             max. basisf.       MAXNZEILE =       42
+ Number of basis funct. for MoM:            27  unknown:       27             max. basisf.       MAXNZEILE =       27
  Number of basis funct. for PO:              0  unknown:        0             max. basisf.       MAXNKAPO  =        0
 
  read from input file:
 PS       0    1    1    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
-FR       1    0    0    0    0 2.998E+08 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
+FR       1    0    0    0    0 2.998E+08 0.000E+00 2.998E+08 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
 DA       1    0    1    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
  read from input file:
@@ -248,8 +264,11 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
  Wavelength in m:               LAMBDA =  1.00000E+00
  Open circuit voltage in V:     |U0| =    1.00000E+00 
  Phase in degrees:              ARG(U0) =        0.00
- Attached to port:              Edge port
+ Attached to port:              Edge port - defined between labels
+ Port between triangle labels:
+   internal_1  internal_2
  Port edge length in m:         2.00000E-02
+ Number of edges:               1
  Indices of the edges:          14
 
 
@@ -260,17 +279,30 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
 
                All segments and triangles are perfectly conducting.
 
+ Distributed storage of MoM matrix for parallel version
 
-                          DATA FOR STORAGE OF THE MATRIX
+                    DISTRIBUTED STORAGE OF MATRIX
+
+   Storage scheme: 1
+   Number of rows of the matrix:                          27
+   Number of columns of the matrix:                       27
+   Number of rows of the process grid:                     2
+   Number of columns of the process grid:                  2
+   Block size:                                             7
+   Theoretical load in percent:                        96.43 %
+   Number of rows of local matrix (proc. 0):              14
+   Number of columns of local mat.(proc. 0):              14
+   Local memory requirement for matrix:                  196 complex numbers
+   (corresponds to 3.063 kByte)
 
  Storage using double precision
 
- Memory requirement for MoM matrix:        32 rows *       27 columns =         864 complex numbers
- For the MoM matrix, a memory of          864 complex numbers is used (i.e. 13.500 kByte)
- Storing the matrix and solving the linear set of equations in main memory (storage scheme 1)
+ Memory requirement for MoM matrix: 27 rows * 27 columns = 729 complex numbers
+ For the MoM matrix, a memory of 196 complex numbers is used (i.e. 3.063 kByte)
 
-     A total of 45.923 kByte of memory has been allocated dynamically
-     (peak memory usage of 45.923 kByte so far)
+     Per process, 94.465 kByte of memory has been allocated dynamically,
+     which corresponds to 365.076 kByte in total for all processes together
+     (peak memory usage of 94.465 kByte per process so far)
 
 
 
@@ -281,14 +313,14 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
      CPU time for preconditioning:       0.000 seconds
 
 
-                    SOLUTION OF THE LINEAR SET OF EQUATIONS WITH LAPAGAU
+               SOLUTION OF THE LINEAR SET OF EQUATIONS WITH SCALAGAU
 
-               Condition number of the matrix:  5.53098E+02
+               Condition number of the matrix: Not available
 
                Floating point performance for LU decomposition:
                     Not determined since computation time too short
 
-     CPU time for solving the linear set of equations:       0.000 seconds
+     CPU time for solving the linear set of equations:       0.090 seconds
 
 
                          DATA OF THE VOLTAGE SOURCE NO. 1
@@ -309,7 +341,6 @@ index  permittivity permeability   in S/m       (electric)    (magnetic)       i
  S     1      1   1.46913E-01 -1.72115E-01   2.26289E-01  -12.9067    -49.52
          Sum |S|^2 of these S-parameters:    5.12068E-02  -12.9067
          Reference impedance in Ohm:  5.00000E+01
-
 
 
 
@@ -512,7 +543,7 @@ FF       1    1   91    0    0 9.000E+01 0.000E+00 1.000E+00 1.000E+00 0.000E+00
       VALUES OF THE SCATTERED ELECTRIC FIELD STRENGTH IN THE FAR FIELD in V
                     Factor e^(-j*Re{BETA}*R)/R not considered
 
-       LOCATION          ETHETA             EPHI              directivity in dB             POLARISATION
+      LOCATION           ETHETA             EPHI              directivity in dB              POLARISATION
    THETA    PHI      magn.    phase     magn.    phase     vert.     horiz.    total     axial r. angle   direction
    90.00    0.00   0.000E+00    0.00  8.281E-01  -72.50  -999.9999    2.0992    2.0992   0.0000    90.00   LINEAR
    90.00    1.00   0.000E+00    0.00  8.280E-01  -71.08  -999.9999    2.0973    2.0973   0.0000    90.00   LINEAR
@@ -618,31 +649,38 @@ EN       0    0    0    0    0 0.000E+00 0.000E+00 0.000E+00 0.000E+00 0.000E+00
                     SUMMARY OF REQUIRED TIMES IN SECONDS
 
                                              CPU-time       runtime
- Reading and constructing the geometry          0.000         0.001
- Checking the geometry                          0.000         0.000
+ Reading and constructing the geometry          0.102         0.102
+ Checking the geometry                          0.001         0.001
  Initialisation of the Green's function         0.000         0.000
  Calcul. of coupling for PO/Fock                0.000         0.000
  Transformation to equivalent sources           0.000         0.000
  Ray launching/tracing phase of RL-GO           0.000         0.000
- Calcul. of matrix elements                     0.010         0.003
+ Calcul. of matrix elements                     0.017         0.016
  Calcul. of right-hand side vector              0.000         0.000
  Preconditioning system of linear eqns.         0.000         0.000
- Solution of the system of linear eqns.         0.000         0.000
- Eigensolution for characteristic modes         0.000         0.000
- Determination of surface currents              0.000         0.000
- Calcul. of impedances/powers/losses            0.000         0.001
+ Solution of the system of linear eqns.         0.090         0.090
+ Calcul. of characteristic modes                0.000         0.000
+ Determination of surface currents              0.001         0.000
+ Calcul. of impedances/powers/losses            0.002         0.003
  Calcul. of averaged SAR values                 0.000         0.000
  Calcul. of power receiving antenna             0.000         0.000
  Calcul. of cable coupling                      0.000         0.000
  Calcul. of error estimates                     0.000         0.000
- Calcul. of electric near field                 0.010         0.003
+ Calcul. of electric near field                 0.014         0.014
  Calcul. of magnetic near field                 0.000         0.000
- Calcul. of far field                           0.000         0.002
-                            other               0.000         0.004
+ Calcul. of far field                           0.003         0.003
+                            other               0.048         0.049
                                          ------------  ------------
-                         total times:           0.020         0.016
+                         total times:           0.278         0.278
                (total times in hours:           0.000         0.000)
 
- Peak memory usage during the whole solution: 55.105 kByte
+ Specified CPU-times are referring to the master process only
+ Sum of the CPU-times of all processes:         1.092 seconds (     0.000 hours)
+ On average per process:                        0.273 seconds (     0.000 hours)
 
-Finished: 2018-05-27 13:17:39                     
+ Peak memory usage during the whole solution: 104.662 kByte
+ (refers to the master process only)
+ Sum of the peak memory of all processes:     405.178 kByte
+ On average per process:                      101.294 kByte
+
+Finished: 2020-07-20 13:43:58                     

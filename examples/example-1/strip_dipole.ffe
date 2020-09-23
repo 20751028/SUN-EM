@@ -1,8 +1,8 @@
 ##File Type: Far field
-##File Format: 4
+##File Format: 6
 ##Source: strip_dipole
-##Date: 2018-05-27 13:17:39  
-** File exported by FEKO kernel version 2017.2.3-538
+##Date: 2020-07-20 13:43:58  
+** File exported by Altair Feko - Solver (par) Version 2019.1-338 from 2019-06-07
 
 #Frequency:   2.99792458E+008
 #Coordinate System: Spherical
