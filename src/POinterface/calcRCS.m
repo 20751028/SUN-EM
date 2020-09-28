@@ -50,6 +50,19 @@ for theta_degrees = theta_grid
         
         EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, theta_degrees, phi_degrees, ...
             Solver_setup, Solution.PO.Isol);
+        HfieldAtPointSpherical = zeros(10/0.01+1, 1);
+        r_obs = 0:0.01:10;
+        for ind = 0:1:1001
+        HfieldAtPointSpherical(ind) =  calculateHfieldAtPointRWG(Const, r_obs(ind), 0, 0, ...
+            Solver_setup, Solution.PO.Isol);
+        end
+        
+        figure;
+        plot(r_obs, 10*log10(HfieldAtPointSpherical));
+        xlabel('R/m');
+        ylabel('E/dBV/m');
+        
+        
         
         relError = calculateErrorNormPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
             message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
