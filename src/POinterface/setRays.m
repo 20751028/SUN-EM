@@ -1,4 +1,4 @@
-function [rays] = setRays(Solver_setup, r)
+function [rays] = setRays(Solver_setup)
 %setRays
 %   Usage:
 %       [rays] = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors)
@@ -29,11 +29,11 @@ function [rays] = setRays(Solver_setup, r)
 
 %For now we project all the centre points onto the plane
 pt = Solver_setup.triangle_centre_point;
-[norm(1), norm(2), norm(3)] = sph2cart(Solver_setup.phi, pi/2-Solver_setup.theta*pi/810, r);
+[norm(1), norm(2), norm(3)] = sph2cart(Solver_setup.phi*pi/180, pi/2-Solver_setup.theta*pi/180, 1);
 norm = -norm;
 N = size(pt,1);
 norm_mat = repmat(norm,[N 1]);
-dist = dot(pt, norm_mat, 2)+r;
+dist = dot(pt, norm_mat, 2)+Solver_setup.r_bounding+0.1;
 rays.origin = pt - dist.*norm;
 rays.dir = norm_mat;
 

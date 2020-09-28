@@ -70,7 +70,7 @@ po.totsolTime = 0.0;
 
 
 %Test to see which basis functions are illuminated
- ray = setRays(Solver_setup, 2);
+ ray = setRays(Solver_setup);
         [tri_id, dist] = Raytracer.intersect_rays(ray);
         [tp, ~, itp] = unique(Solver_setup.rwg_basis_functions_trianglePlus);
         [tm, ~, itm] = unique(Solver_setup.rwg_basis_functions_triangleMinus);
@@ -81,6 +81,7 @@ po.totsolTime = 0.0;
         tp(i_vis_neg) = -1;
         vis_neg = (tp(itm)==-1);
         visible = vis_pos & vis_neg;
+        visible = visible(1:Npo);
         %debug: plot the visible basis functions
         scatter3(Solver_setup.rwg_basis_functions_shared_edge_centre(visible,1),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,2),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,3));
         axis('equal');
@@ -123,25 +124,30 @@ for freq=1:numFreq
         %b = L\yVectors.values(:,index);
         rn = Solver_setup.rwg_basis_functions_shared_edge_centre(index, :);
         shared_nodes = Solver_setup.rwg_basis_functions_shared_edge_nodes(index, :);
-        ln = Solver_setup.nodes_xyz(shared_nodes(1), :) - Solver_setup.nodes_xyz(shared_nodes(2), :);
+        ln = Solver_setup.nodes_xyz(shared_nodes(2), :) - Solver_setup.nodes_xyz(shared_nodes(1), :);
         ln = ln/Solver_setup.rwg_basis_functions_length_m(index);
         %We do not know if this direction for ln is correct according
-        %to our reference. This is checked and possibly corrected below.
+        %to our reference. This is checked and corrected if necessary
+        %below.
         
-        side = Solver_setup.nodes_xyz(shared_nodes(2), :)- Solver_setup.nodes_xyz(Solver_setup.rwg_basis_functions_trianglePlusFreeVertex(index), :);
+        side = Solver_setup.nodes_xyz(Solver_setup.rwg_basis_functions_trianglePlusFreeVertex(index), :) - Solver_setup.nodes_xyz(shared_nodes(1), :);
         normTest = cross(side, ln);
         reverse = dot(normTest, Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(index), :));
         if(reverse < 0)
             ln = -ln;
         end
         
-       
-        delta = visible(index); 
-        k = 2*pi*5000E6/3E8; %set 1000MHz freq
+        %The visibility term (delta) should be set to 0 if either triangle is not
+        %visible or +-1 depending on the incident direction relative to the
+        %surface normal.
+        nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(index), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(index), :));
+        delta = nDotRay/abs(nDotRay);
+        
+        k = 2*pi*Solver_setup.frequencies.samples(freq)/Const.C0;
         [kx, ky, kz] = sph2cart(Solver_setup.phi*Const.DEG2RAD, (90-Solver_setup.theta)*Const.DEG2RAD, -k);
         k_vec = [kx, ky, kz];
         H = (1/Const.ETA_0)*exp(j*dot(k_vec, rn));    %Find impressed H field (r directed plane wave with E field theta-polarised)
-        a_phi = [-sin(Solver_setup.phi*Const.DEG2RAD), cos(Solver_setup.phi*Const.DEG2RAD), 0];
+        a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
         H_vec = -H*a_phi;
         po.Isol(index) = dot(2*delta*H_vec, ln);
     end%for
@@ -162,23 +168,20 @@ for freq=1:numFreq
     
 end%for freq=1:numFreq
 
-message_fc(Const,sprintf('Finished MoM solver in %f sec.',po.totsolTime));
-message_fc(Const,sprintf('(Times for Z-setup : %f sec. and LU-fact. : %f)',po.totsetupTime, ...
-    po.totfactorisationTime));
-message_fc(Const,sprintf('Memory usage of PO %s',po.memUsage));
+message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 
 % Compare the MoM solution obtained with MATLAB, with that obtained by FEKO
 % that was stored in xVectors.values (for each frequency iteration (and each solution within the frequency iteration)
 % Calculate also space for the relative error here
-po.relError = zeros(1,po.numSols);
-for freq=1:numFreq
-    for solNum=1:numRHSperFreq
-        index = solNum + (freq-1)*numRHSperFreq;
-        po.relError(index) = calculateErrorNormPercentage(refIsol.Isol(1:Solver_setup.num_metallic_edges,index), po.Isol(:,index));
-        message_fc(Const,sprintf('Rel. error norm. for Sol. %d of %d of freq. %d of %d compared to reference sol. %f percent',solNum, ...
-            numRHSperFreq, freq, numFreq, po.relError(index)));
-    end
-end
+% po.relError = zeros(1,po.numSols);
+% for freq=1:numFreq
+%     for solNum=1:numRHSperFreq
+%         index = solNum + (freq-1)*numRHSperFreq;
+%         po.relError(index) = calculateErrorNormPercentage(refIsol.Isol(1:Solver_setup.num_metallic_edges,index), po.Isol(:,index));
+%         message_fc(Const,sprintf('Rel. error norm. for Sol. %d of %d of freq. %d of %d compared to reference sol. %f percent',solNum, ...
+%             numRHSperFreq, freq, numFreq, po.relError(index)));
+%     end
+% end
 
 % Write the MoM solution to a ASCII str file, so that it can be read
 % again by FEKO (for plotting in POSTFEKO) - only if requested (i.e. if the filename is defined)

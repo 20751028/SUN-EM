@@ -29,15 +29,15 @@ function [RCS] = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors)
 %   Email: 20751028@sun.ac.za
 
 narginchk(5,5);
-r = 1000;
-getBoundingRadius(Solver_setup);
+r = 100000;
+Solver_setup.r_bounding = getBoundingRadius(Solver_setup);
 % Calculate now the E-field value here internal
 index = 0;
 RCS = zeros(length(theta_grid)*length(phi_grid), 1);
 Raytracer.setGeom(Solver_setup);
 
 for theta_degrees = theta_grid
-    for phi_degrees = phi_grid % 0 to 90 degr. in steps of 1 degrees
+    for phi_degrees = phi_grid
         index = index + 1;
         
         Solver_setup.theta = theta_degrees;
@@ -51,6 +51,9 @@ for theta_degrees = theta_grid
         EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, theta_degrees, phi_degrees, ...
             Solver_setup, Solution.PO.Isol);
         
+        relError = calculateErrorNormPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
+            message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
+        
         
         % Calculate now the magnitude of the E-field vector.
         Efield_magnitude = sqrt(abs(EfieldAtPointSpherical(1))^2 + ...
@@ -62,9 +65,9 @@ end%for
 
 end
 
-function getBoundingRadius(Solver_setup)
+function r = getBoundingRadius(Solver_setup)
 vertices = double(Solver_setup.nodes_xyz);
-Solver_setup.r_bounding = max(sqrt(sum(vertices.^2,2)));
+r = max(sqrt(sum(vertices.^2,2)));
 end
 
 

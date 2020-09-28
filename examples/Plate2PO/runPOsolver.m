@@ -153,15 +153,15 @@ function [po] = runPOsolver(Const, Solver_setup, ~, ~, refIsol)
     % Compare the MoM solution obtained with MATLAB, with that obtained by FEKO
     % that was stored in xVectors.values (for each frequency iteration (and each solution within the frequency iteration)
     % Calculate also space for the relative error here
-    po.relError = zeros(1,po.numSols);
-    for freq=1:numFreq
-        for solNum=1:numRHSperFreq
-            index = solNum + (freq-1)*numRHSperFreq;
-            po.relError(index) = calculateErrorNormPercentage(refIsol.Isol(1:Solver_setup.num_metallic_edges,index), po.Isol(:,index));
-            message_fc(Const,sprintf('Rel. error norm. for Sol. %d of %d of freq. %d of %d compared to reference sol. %f percent',solNum, ...
-                numRHSperFreq, freq, numFreq, po.relError(index)));
-        end
-    end
+%     po.relError = zeros(1,po.numSols);
+%     for freq=1:numFreq
+%         for solNum=1:numRHSperFreq
+%             index = solNum + (freq-1)*numRHSperFreq;
+%             po.relError(index) = calculateErrorNormPercentage(refIsol.Isol(1:Solver_setup.num_metallic_edges,index), po.Isol(:,index));
+%             message_fc(Const,sprintf('Rel. error norm. for Sol. %d of %d of freq. %d of %d compared to reference sol. %f percent',solNum, ...
+%                 numRHSperFreq, freq, numFreq, po.relError(index)));
+%         end
+%     end
     
     % Write the MoM solution to a ASCII str file, so that it can be read
     % again by FEKO (for plotting in POSTFEKO) - only if requested (i.e. if the filename is defined)

@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflector.mat';
-Const.FEKOstrfilename          = 'reflector.str';
-Const.FEKOrhsfilename          = 'reflector.rhs';
-Const.FEKOoutfilename          = 'reflector.out';
+Const.FEKOmatfilename          = 'reflectorRT.mat';
+Const.FEKOstrfilename          = 'reflectorRT.str';
+Const.FEKOrhsfilename          = 'reflectorRT.rhs';
+Const.FEKOoutfilename          = 'reflectorRT.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -52,7 +52,7 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % Set up a number of frames to be run (ie one per incident angle)
 % --------------------------------------------------------------------------------------------------
-theta_grid = 10:1:170;
+theta_grid = 10:0.5:170;
 phi_grid = 0:1:0;
 
 num_theta_samples = length(theta_grid);
