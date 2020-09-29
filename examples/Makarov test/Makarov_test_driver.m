@@ -37,7 +37,7 @@ Const.FEKOoutfilename          = 'plate.out';
 % --------------------------------------------------------------------------------------------------
 % Read the MoM matrix equation from the file
 % --------------------------------------------------------------------------------------------------
-[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
+%[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
 yVectors.numRhs = xVectors.numMoMbasis;
 Const = sunem_init(Const, yVectors);
 
@@ -46,7 +46,7 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % TO-DO: At a later stage we can also add other meshing / geometry
 % preprocessxing, e.g. Gmsh or GiD. For now the solver setup is read from FEKO.
-[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
+%[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
 
 
 % --------------------------------------------------------------------------------------------------
