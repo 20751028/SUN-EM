@@ -75,21 +75,21 @@ end
 
 
 %Test to see which basis functions are illuminated
- ray = setRays(Solver_setup);
-        [tri_id, dist] = Raytracer.intersect_rays(ray);
-        [tp, ~, itp] = unique(Solver_setup.rwg_basis_functions_trianglePlus);
-        [tm, ~, itm] = unique(Solver_setup.rwg_basis_functions_triangleMinus);
-        [~, i_vis_pos, ~] = intersect(tp, tri_id);
-        [~, i_vis_neg, ~] = intersect(tm, tri_id);
-        tp(i_vis_pos) = -1;
-        vis_pos = (tp(itp)==-1);
-        tp(i_vis_neg) = -1;
-        vis_neg = (tp(itm)==-1);
-        visible = vis_pos & vis_neg;
-        visible = visible(1:Npo);
-        %debug: plot the visible basis functions
-        %scatter3(Solver_setup.rwg_basis_functions_shared_edge_centre(visible,1),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,2),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,3));
-        %axis('equal');
+ray = setRays(Solver_setup);
+[tri_id, dist] = Raytracer.intersect_rays(ray);
+[tp, ~, itp] = unique(Solver_setup.rwg_basis_functions_trianglePlus);
+[tm, ~, itm] = unique(Solver_setup.rwg_basis_functions_triangleMinus);
+[~, i_vis_pos, ~] = intersect(tp, tri_id);
+[~, i_vis_neg, ~] = intersect(tm, tri_id);
+tp(i_vis_pos) = -1;
+vis_pos = (tp(itp)==-1);
+tp(i_vis_neg) = -1;
+vis_neg = (tp(itm)==-1);
+visible = vis_pos & vis_neg;
+visible = visible(1:Npo);
+%debug: plot the visible basis functions
+%scatter3(Solver_setup.rwg_basis_functions_shared_edge_centre(visible,1),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,2),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,3));
+%axis('equal');
 
 % Start the frequency loop now
 for freq=1:numFreq
@@ -143,21 +143,25 @@ for freq=1:numFreq
     a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
     H_vec = -H*a_phi;
     Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
-
+    
     
     for refl_num = 2:Solver_setup.num_reflections
+        Isol_refl = complex(zeros(Npo, 2));
+        tic
         for n = 1:Npo
-            tic
-            Isol_pos = Isol(:, 1).*(Solver_setup.Visibility_matrix(:, n) == 1) + Isol(:, 2).*(Solver_setup.Visibility_matrix(:, n) == 3);
-            Isol_neg = Isol(:, 1).*(Solver_setup.Visibility_matrix(:, n) == 2) + Isol(:, 2).*(Solver_setup.Visibility_matrix(:, n) == 4);
-            H_vec_pos = calculateHfieldAtPointRWGCart(Const, rn(n, 1), rn(n, 2), rn(n, 3), ...
-    Solver_setup, Isol_pos);
-            H_vec_neg = calculateHfieldAtPointRWGCart(Const, rn(n, 1), rn(n, 2), rn(n, 3), ...
-                Solver_setup, Isol_neg);
-            Isol(n, 1) = Isol(n, 1) + dot(2*H_vec_pos, ln(n, :), 2);
-            Isol(n, 2) = Isol(n, 2) + dot(-2*H_vec_neg, ln(n, :), 2);
-            toc
+            Isol_pos = zeros(Npo, 1);
+            Isol_neg = zeros(Npo, 1);
+            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 1)) = Isol((Solver_setup.Visibility_matrix(:, n) == 1), 1);
+            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 3)) = Isol((Solver_setup.Visibility_matrix(:, n) == 3), 2);
+            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 2)) = Isol((Solver_setup.Visibility_matrix(:, n) == 2), 1);
+            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 4)) = Isol((Solver_setup.Visibility_matrix(:, n) == 4), 2);
+            H_vec_pos = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_pos);
+            %H_vec_neg = calculateHfieldAtPointRWG(Const, rn(n, 1), rn(n, 3), rn(n, 3), Solver_setup, Isol_neg);
+            H_vec_neg = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_neg);
+            Isol_refl(n, :) = [dot(2*H_vec_pos, ln(n, :), 2)  dot(-2*H_vec_neg, ln(n, :), 2)];
         end
+        toc
+        Isol = Isol + Isol_refl;
     end
     
     % End timing (MoM factorisation)
@@ -175,7 +179,9 @@ for freq=1:numFreq
     po.totsolTime = po.totsolTime + po.solTime(freq);
     
 end%for freq=1:numFreq
-po.Isol = Isol(:, 1)+Isol(:, 2);
+po.Isol = po.Isol + Isol(:, 1).*BF_side(:, 1);
+po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
+%po.Isol = Isol(:, 1) + Isol(:, 2);
 
 message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 

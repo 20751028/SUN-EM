@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflectorRT.mat';
-Const.FEKOstrfilename          = 'reflectorRT.str';
-Const.FEKOrhsfilename          = 'reflectorRT.rhs';
-Const.FEKOoutfilename          = 'reflectorRT.out';
+Const.FEKOmatfilename          = 'reflectorRT1G.mat';
+Const.FEKOstrfilename          = 'reflectorRT1G.str';
+Const.FEKOrhsfilename          = 'reflectorRT1G.rhs';
+Const.FEKOoutfilename          = 'reflectorRT1G.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -59,7 +59,7 @@ num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);
 total_efield_samples = num_theta_samples*num_phi_samples;
 Efield_magnitude = zeros(total_efield_samples,1);
-Solver_setup.Visibility_matrix = Visibility_matrix;
+Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
 %calculate the monostatic RCS
 RCS = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors);
 

@@ -1,4 +1,4 @@
-function HfieldAtPointCartesian =  calculateHfieldAtPointRWGCart(Const, Px, Py, Pz, ...
+function HfieldAtPointCartesian =  calculateHfieldAtPointRWGCart(Const, P, ...
     Solver_setup, Isol)
     %calculateEfieldAtPointRWG
     %   Usage:
@@ -40,6 +40,7 @@ function HfieldAtPointCartesian =  calculateHfieldAtPointRWGCart(Const, Px, Py, 
     % Initialisations
     % Note: for each frequency, we will have a different field
     HfieldAtPointCartesian = zeros(Solver_setup.frequencies.freq_num, 3);
+    nzind = find(Isol);
 
     for freq_index = 1:Solver_setup.frequencies.freq_num
 
@@ -47,62 +48,69 @@ function HfieldAtPointCartesian =  calculateHfieldAtPointRWGCart(Const, Px, Py, 
         lambda = Const.C0/Solver_setup.frequencies.samples(freq_index);
         k = 2*pi/lambda;
         K = 1j*k/(4*pi);
+        Npo = length(nzind);
         %K = 1.0;
 
         % The E-field at the point is calculated as the superposition of the individual 
         % RWG (dipole) contributions. See definitions for m, M and C (Eqs. 9a and 9b)
-        for rwg_bf_index = 1:Solver_setup.num_metallic_edges
+        %for rwg_bf_index = 1:Solver_setup.num_metallic_edges
 
             % --------------------------------
             % calculate m (the dipole moment vector) associate with the mth edge: 
             %     m = lm*Im*[ (r_mc^-) - (r_mc^+)]
             % where "c" denotes the triangle midpoint.
             % --------------------------------
-            lengthM = Solver_setup.rwg_basis_functions_length_m(rwg_bf_index);
-            Im = Isol(rwg_bf_index);
-            if (Im == 0)
-                continue
-            end
+            lengthM = Solver_setup.rwg_basis_functions_length_m(nzind);
+            Im = Isol(nzind);
+%             if (Im == 0)
+%                 continue
+%             end
 
-            triangle_plus = Solver_setup.rwg_basis_functions_trianglePlus(rwg_bf_index);
-            triangle_minus = Solver_setup.rwg_basis_functions_triangleMinus(rwg_bf_index);
+            triangle_plus = Solver_setup.rwg_basis_functions_trianglePlus;
+            triangle_minus = Solver_setup.rwg_basis_functions_triangleMinus;
 
-            rMplusX  = Solver_setup.triangle_centre_point(triangle_plus,1);
-            rMminusX = Solver_setup.triangle_centre_point(triangle_minus,1);
-            
-            rMplusY  = Solver_setup.triangle_centre_point(triangle_plus,2);
-            rMminusY = Solver_setup.triangle_centre_point(triangle_minus,2);
-            
-            rMplusZ  = Solver_setup.triangle_centre_point(triangle_plus,3);
-            rMminusZ = Solver_setup.triangle_centre_point(triangle_minus,3);
+%             rMplusX  = Solver_setup.triangle_centre_point(triangle_plus(1:Npo),1);
+%             rMminusX = Solver_setup.triangle_centre_point(triangle_minus(1:Npo),1);
+%             
+%             rMplusY  = Solver_setup.triangle_centre_point(triangle_plus(1:Npo),2);
+%             rMminusY = Solver_setup.triangle_centre_point(triangle_minus(1:Npo),2);
+%             
+%             rMplusZ  = Solver_setup.triangle_centre_point(triangle_plus(1:Npo),3);
+%             rMminusZ = Solver_setup.triangle_centre_point(triangle_minus(1:Npo),3);
+rMplus = Solver_setup.triangle_centre_point(triangle_plus(nzind),:);
+rMminus = Solver_setup.triangle_centre_point(triangle_minus(nzind),:);
 
-            rwgDipoleCentreXYZ  = lineCentre([rMplusX, rMplusY, rMplusZ],[rMminusX, rMminusY, rMminusZ]);
-            rwgDipoleCentre = rwgDipoleCentreXYZ;
-            
-            rL = sqrt( (rwgDipoleCentre(1) - Px)^2 + (rwgDipoleCentre(2) - Py)^2 + ...
-                (rwgDipoleCentre(3) - Pz)^2 );
-            
-            rLvecX = Px - rwgDipoleCentreXYZ(1);
-            rLvecY = Py - rwgDipoleCentreXYZ(2);
-            rLvecZ = Pz - rwgDipoleCentreXYZ(3);
-            rLvec = [rLvecX, rLvecY, rLvecZ];        
-                                                            
-            C = (1/(rL*rL)) * (1 + 1/(1j*k*rL));
+%            rwgDipoleCentreXYZ  = lineCentre([rMplusX, rMplusY, rMplusZ],[rMminusX, rMminusY, rMminusZ]);
 
-            mX = lengthM*Im*(rMminusX - rMplusX);
-            mY = lengthM*Im*(rMminusY - rMplusY);
-            mZ = lengthM*Im*(rMminusZ - rMplusZ);
-            m = [mX, mY, mZ];
+            rwgDipoleCentre = (rMplus + rMminus)*0.5;
+            
+%             
+            
+%             rLvecX = Px - rwgDipoleCentreXYZ(1);
+%             rLvecY = Py - rwgDipoleCentreXYZ(2);
+%             rLvecZ = Pz - rwgDipoleCentreXYZ(3);
+            rLvec = repmat(P, [Npo, 1]) - rwgDipoleCentre;
+            rL = sqrt( rLvec(:, 1).^2 + rLvec(:, 2).^2 + rLvec(:, 3).^2 )';
+            %rL = vecnorm(rLvec, 2, 2)';
+            
+            C = (1./rL.^2) .* (1 + 1./(1j*k*rL));
+            %rL is set to 0 in some places. For now, we remove these. TODO: find out why. 
+            C(rL == 0) = 0;
+
+%             mX = lengthM*Im*(rMminusX - rMplusX);
+%             mY = lengthM*Im*(rMminusY - rMplusY);
+%             mZ = lengthM*Im*(rMminusZ - rMplusZ);
+            m = lengthM.*Im.*(rMminus-rMplus);
 
 
             % calculate the H-field (x,y,z) due to this RWG Basis Function. Note, the phase is referenced 
             % relative to the centre of the dipole. Account for that below.
             phaseTerm = exp(-1j*k*rL);  
             
-            HfieldCurrentRWG = K * cross(m, rLvec) * C * phaseTerm;
+            HfieldCurrentRWG = K * (C .* phaseTerm) * cross(m, rLvec, 2);
 
             HfieldAtPointCartesian(freq_index, :) = HfieldAtPointCartesian(freq_index, :) + HfieldCurrentRWG;
-        end
+        %end
 
     end%for freq_index = 1:Solver_setup.freq_num
 
