@@ -37,7 +37,7 @@ Const.FEKOoutfilename          = 'reflectorRT.out';
 % --------------------------------------------------------------------------------------------------
 % Read the MoM matrix equation from the file
 % --------------------------------------------------------------------------------------------------
-[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
+%[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
 yVectors.numRhs = xVectors.numMoMbasis;
 Const = sunem_init(Const, yVectors);
 
@@ -46,7 +46,7 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % TO-DO: At a later stage we can also add other meshing / geometry
 % preprocessxing, e.g. Gmsh or GiD. For now the solver setup is read from FEKO.
-[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
+%[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
 
 
 % --------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);
 total_efield_samples = num_theta_samples*num_phi_samples;
 Efield_magnitude = zeros(total_efield_samples,1);
-
+Solver_setup.Visibility_matrix = Visibility_matrix;
 %calculate the monostatic RCS
 RCS = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors);
 

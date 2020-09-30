@@ -53,13 +53,14 @@ numRHSperFreq = po.numSols / numFreq;         % The number of solutions per freq
 % For now, should be 1 (TO-DO: Update)
 
 % Some info about the solution configurations
-message_fc(Const,sprintf('  numSols : %d', po.numSols));
-message_fc(Const,sprintf('  numFreq : %d', numFreq));
-message_fc(Const,sprintf('  numRHSperFreq : %d', numRHSperFreq));
+% message_fc(Const,sprintf('  numSols : %d', po.numSols));
+% message_fc(Const,sprintf('  numFreq : %d', numFreq));
+% message_fc(Const,sprintf('  numRHSperFreq : %d', numRHSperFreq));
 
-% Calculate the solution vector (all frequency points, all RHSes)
-po.Isol = complex(zeros(Npo,po.numSols));
-
+% Calculate the solution vector (observable BFs only)
+po.Isol = complex(zeros(Npo,1));
+%create an intermediate solution vector with all BFs positive and negative
+Isol = complex(zeros(Npo,2));
 % The timing calculations also need to take into account that there is a
 % frequency loop
 po.setupTime = zeros(1,numFreq);
@@ -67,6 +68,10 @@ po.setupTime = zeros(1,numFreq);
 po.totsetupTime = 0.0;
 po.totfactorisationTime = 0.0;
 po.totsolTime = 0.0;
+
+if(Solver_setup.num_reflections > 1)
+    MRPO = true;
+end
 
 
 %Test to see which basis functions are illuminated
@@ -83,8 +88,8 @@ po.totsolTime = 0.0;
         visible = vis_pos & vis_neg;
         visible = visible(1:Npo);
         %debug: plot the visible basis functions
-        scatter3(Solver_setup.rwg_basis_functions_shared_edge_centre(visible,1),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,2),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,3));
-        axis('equal');
+        %scatter3(Solver_setup.rwg_basis_functions_shared_edge_centre(visible,1),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,2),Solver_setup.rwg_basis_functions_shared_edge_centre(visible,3));
+        %axis('equal');
 
 % Start the frequency loop now
 for freq=1:numFreq
@@ -106,51 +111,54 @@ for freq=1:numFreq
     % End timing (calculating the impedance matrix)
     po.setupTime(freq) = toc;
     
-    % Start timing (MoM factorisation)
+    % Start timing
     tic
-    % LU-decomposition of the Z-matrix
-    %[L,U] = lu(Zmom);
     
-    % Loop over the RHs vectors (numSols) and calculate each of the currents.
-    for index=solStart:Npo
-        
-        % Take care where we are extracting the values from (out of Yrhs)
-        % and also where we will be storing these values again (in Xsol)
-        %index = solNum + (freq-1)*numRHSperFreq;
-        % DJdbg --> remove
-        %message_fc(Const,sprintf('  index: %d', index));
-        
-        % Back-wards substitution
-        %b = L\yVectors.values(:,index);
-        rn = Solver_setup.rwg_basis_functions_shared_edge_centre(index, :);
-        shared_nodes = Solver_setup.rwg_basis_functions_shared_edge_nodes(index, :);
-        ln = Solver_setup.nodes_xyz(shared_nodes(2), :) - Solver_setup.nodes_xyz(shared_nodes(1), :);
-        ln = ln/Solver_setup.rwg_basis_functions_length_m(index);
-        %We do not know if this direction for ln is correct according
-        %to our reference. This is checked and corrected if necessary
-        %below.
-        
-        side = Solver_setup.nodes_xyz(Solver_setup.rwg_basis_functions_trianglePlusFreeVertex(index), :) - Solver_setup.nodes_xyz(shared_nodes(1), :);
-        normTest = cross(side, ln);
-        reverse = dot(normTest, Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(index), :));
-        if(reverse < 0)
-            ln = -ln;
+    
+    rn = Solver_setup.rwg_basis_functions_shared_edge_centre;
+    shared_nodes = Solver_setup.rwg_basis_functions_shared_edge_nodes;
+    ln = Solver_setup.nodes_xyz(shared_nodes(:, 2), :) - Solver_setup.nodes_xyz(shared_nodes(:, 1), :);
+    ln = ln./Solver_setup.rwg_basis_functions_length_m(1:Npo);
+    %We do not know if this direction for ln is correct according
+    %to our reference. This is checked and corrected if necessary
+    %below.
+    
+    side = Solver_setup.nodes_xyz(Solver_setup.rwg_basis_functions_trianglePlusFreeVertex, :) - Solver_setup.nodes_xyz(shared_nodes(:, 1), :);
+    normTest = cross(side, ln, 2);
+    reverse = dot(normTest, Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
+    ln = ln.*reverse./abs(reverse);
+    
+    
+    %The visibility term (delta) should be set to 0 if either triangle is not
+    %visible or +-1 depending on the incident direction relative to the
+    %surface normal.
+    nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
+    delta = nDotRay./abs(nDotRay).*visible;
+    BF_side = [delta > 0, delta < 0];
+    
+    k = 2*pi*Solver_setup.frequencies.samples(freq)/Const.C0;
+    [kx, ky, kz] = sph2cart(Solver_setup.phi*Const.DEG2RAD, (90-Solver_setup.theta)*Const.DEG2RAD, -k);
+    k_vec = repmat([kx, ky, kz], [Npo, 1]);
+    H = (1/Const.ETA_0)*exp(j*dot(k_vec, rn, 2));    %Find impressed H field (r directed plane wave with E field theta-polarised)
+    a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
+    H_vec = -H*a_phi;
+    Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
+
+    
+    for refl_num = 2:Solver_setup.num_reflections
+        for n = 1:Npo
+            tic
+            Isol_pos = Isol(:, 1).*(Solver_setup.Visibility_matrix(:, n) == 1) + Isol(:, 2).*(Solver_setup.Visibility_matrix(:, n) == 3);
+            Isol_neg = Isol(:, 1).*(Solver_setup.Visibility_matrix(:, n) == 2) + Isol(:, 2).*(Solver_setup.Visibility_matrix(:, n) == 4);
+            H_vec_pos = calculateHfieldAtPointRWGCart(Const, rn(n, 1), rn(n, 2), rn(n, 3), ...
+    Solver_setup, Isol_pos);
+            H_vec_neg = calculateHfieldAtPointRWGCart(Const, rn(n, 1), rn(n, 2), rn(n, 3), ...
+                Solver_setup, Isol_neg);
+            Isol(n, 1) = Isol(n, 1) + dot(2*H_vec_pos, ln(n, :), 2);
+            Isol(n, 2) = Isol(n, 2) + dot(-2*H_vec_neg, ln(n, :), 2);
+            toc
         end
-        
-        %The visibility term (delta) should be set to 0 if either triangle is not
-        %visible or +-1 depending on the incident direction relative to the
-        %surface normal.
-        nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(index), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(index), :));
-        delta = nDotRay/abs(nDotRay);
-        
-        k = 2*pi*Solver_setup.frequencies.samples(freq)/Const.C0;
-        [kx, ky, kz] = sph2cart(Solver_setup.phi*Const.DEG2RAD, (90-Solver_setup.theta)*Const.DEG2RAD, -k);
-        k_vec = [kx, ky, kz];
-        H = (1/Const.ETA_0)*exp(j*dot(k_vec, rn));    %Find impressed H field (r directed plane wave with E field theta-polarised)
-        a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
-        H_vec = -H*a_phi;
-        po.Isol(index) = dot(2*delta*H_vec, ln);
-    end%for
+    end
     
     % End timing (MoM factorisation)
     po.factorisationTime(freq) = toc;
@@ -167,6 +175,7 @@ for freq=1:numFreq
     po.totsolTime = po.totsolTime + po.solTime(freq);
     
 end%for freq=1:numFreq
+po.Isol = Isol(:, 1)+Isol(:, 2);
 
 message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 

@@ -35,6 +35,7 @@ Solver_setup.r_bounding = getBoundingRadius(Solver_setup);
 index = 0;
 RCS = zeros(length(theta_grid)*length(phi_grid), 1);
 Raytracer.setGeom(Solver_setup);
+Solver_setup.num_reflections = 2;
 
 for theta_degrees = theta_grid
     for phi_degrees = phi_grid
@@ -46,31 +47,34 @@ for theta_degrees = theta_grid
         % --------------------------------------------------------------------------------------------------
         % Run the EM solver
         % --------------------------------------------------------------------------------------------------
-        [Solution] = runEMsolvers(Const, Solver_setup, 0, 0, xVectors);
+        %         tic;
+        %         [Vpp Vpn Vnp Vnn] = selfShadow(Solver_setup);
+        %         toc;
         
+        [Solution] = runEMsolvers(Const, Solver_setup, 0, 0, xVectors);
         EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, theta_degrees, phi_degrees, ...
             Solver_setup, Solution.PO.Isol);
-%         HfieldAtPointSpherical = zeros(10/0.01+1, 3);
-%         r_obs = 0:0.001:1;
-%         for ind = 1:1001
-%         HfieldAtPointSpherical(ind, :) =  calculateHfieldAtPointRWG(Const, r_obs(ind), 0, 0, ...
-%             Solver_setup, Solution.PO.Isol);
-%         end
-%         
-%         Hfield_magnitude = sqrt(abs(HfieldAtPointSpherical(:, 1)).^2 + ...
-%             abs(HfieldAtPointSpherical(:,2)).^2 + ...
-%             abs(HfieldAtPointSpherical(:, 3)).^2);
-%         Hfield_magnitudedB = 20*log10(Hfield_magnitude);
-%         
-%         figure;
-%         plot(r_obs, Hfield_magnitudedB);
-%         hold on
-%         xlabel('R/m');
-%         ylabel('E/dBV/m');
+        
+        %         HfieldAtPointSpherical = zeros(10/0.01+1, 3);
+        %         r_obs = 0:0.001:1;
+        %         for ind = 1:1001
+        %         HfieldAtPointSpherical(ind, :) =  calculateHfieldAtPointRWG(Const, r_obs(ind), 0, 0, ...
+        %             Solver_setup, Solution.PO.Isol);
+        %         end
+        %
+        %         Hfield_magnitude = sqrt(abs(HfieldAtPointSpherical(:, 1)).^2 + ...
+        %             abs(HfieldAtPointSpherical(:,2)).^2 + ...
+        %             abs(HfieldAtPointSpherical(:, 3)).^2);
+        %         Hfield_magnitudedB = 20*log10(Hfield_magnitude);
+        %
+        %         figure;
+        %         plot(r_obs, Hfield_magnitudedB);
+        %         hold on
+        %         xlabel('R/m');
+        %         ylabel('E/dBV/m');
         
         relError = calculateErrorNormPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
-            message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
-        
+        message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
         
         % Calculate now the magnitude of the E-field vector.
         Efield_magnitude = sqrt(abs(EfieldAtPointSpherical(1))^2 + ...
