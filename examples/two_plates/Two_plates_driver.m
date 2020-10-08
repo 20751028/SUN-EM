@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'plate.mat';
-Const.FEKOstrfilename          = 'plate.str';
-Const.FEKOrhsfilename          = 'plate.rhs';
-Const.FEKOoutfilename          = 'plate.out';
+Const.FEKOmatfilename          = '2plates.mat';
+Const.FEKOstrfilename          = '2plates.str';
+Const.FEKOrhsfilename          = '2plates.rhs';
+Const.FEKOoutfilename          = '2plates.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -52,14 +52,16 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % Set up a number of frames to be run (ie one per incident angle)
 % --------------------------------------------------------------------------------------------------
-theta_grid = 0:1:0;
+theta_grid = 90:2:90;
 phi_grid = 0:1:0;
+
+%Set number of reflections for MRPO
+Solver_setup.num_reflections = 2;
 
 num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);
 total_efield_samples = num_theta_samples*num_phi_samples;
 Efield_magnitude = zeros(total_efield_samples,1);
-
 %calculate the monostatic RCS
 RCS = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors);
 

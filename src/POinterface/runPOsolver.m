@@ -69,10 +69,6 @@ po.totsetupTime = 0.0;
 po.totfactorisationTime = 0.0;
 po.totsolTime = 0.0;
 
-if(Solver_setup.num_reflections > 1)
-    MRPO = true;
-end
-
 
 %Test to see which basis functions are illuminated
 ray = setRays(Solver_setup);
@@ -133,36 +129,43 @@ for freq=1:numFreq
     %visible or +-1 depending on the incident direction relative to the
     %surface normal.
     nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
-    delta = nDotRay./abs(nDotRay).*visible;
-    BF_side = [delta > 0, delta < 0];
+    delta = -nDotRay./abs(nDotRay).*visible;
+    BF_side = [delta > 0.017, delta < -0.017];
     
     k = 2*pi*Solver_setup.frequencies.samples(freq)/Const.C0;
     [kx, ky, kz] = sph2cart(Solver_setup.phi*Const.DEG2RAD, (90-Solver_setup.theta)*Const.DEG2RAD, -k);
     k_vec = repmat([kx, ky, kz], [Npo, 1]);
-    H = (1/Const.ETA_0)*exp(j*dot(k_vec, rn, 2));    %Find impressed H field (r directed plane wave with E field theta-polarised)
+    H = (1/Const.ETA_0)*exp(1j*(dot(k_vec, rn, 2)));    %Find impressed H field (r directed plane wave with E field theta-polarised)
     a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
-    H_vec = -H*a_phi;
+    H_vec = H*a_phi;
     Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
+
+%     H = complex(zeros(100, 3));
+%     for n = 1:100
+%         H(n,:) = calculateHfieldAtPointRWGCart(Const, [n/100-0.01, 0, 0], Solver_setup, Isol(:, 2));
+%     end
+%     figure
+%     plot(0:99, H(:, 2));
     
     
+    Isol_refl = complex(zeros(Npo, 2, Solver_setup.num_reflections));
+    Isol_refl(:, :, 1) = Isol;
     for refl_num = 2:Solver_setup.num_reflections
-        Isol_refl = complex(zeros(Npo, 2));
-        tic
+        H_vec_pos = zeros(Npo, 3);
+        H_vec_neg = zeros(Npo, 3);
         for n = 1:Npo
-            Isol_pos = zeros(Npo, 1);
-            Isol_neg = zeros(Npo, 1);
-            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 1)) = Isol((Solver_setup.Visibility_matrix(:, n) == 1), 1);
-            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 3)) = Isol((Solver_setup.Visibility_matrix(:, n) == 3), 2);
-            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 2)) = Isol((Solver_setup.Visibility_matrix(:, n) == 2), 1);
-            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 4)) = Isol((Solver_setup.Visibility_matrix(:, n) == 4), 2);
-            H_vec_pos = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_pos);
-            %H_vec_neg = calculateHfieldAtPointRWG(Const, rn(n, 1), rn(n, 3), rn(n, 3), Solver_setup, Isol_neg);
-            H_vec_neg = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_neg);
-            Isol_refl(n, :) = [dot(2*H_vec_pos, ln(n, :), 2)  dot(-2*H_vec_neg, ln(n, :), 2)];
+            Isol_pos = complex(zeros(Npo, 1));
+            Isol_neg = complex(zeros(Npo, 1));
+            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 1)) = Isol_refl((Solver_setup.Visibility_matrix(:, n) == 1), 1, refl_num-1);
+            Isol_pos((Solver_setup.Visibility_matrix(:, n) == 3)) = Isol_refl((Solver_setup.Visibility_matrix(:, n) == 3), 2, refl_num-1);
+            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 2)) = Isol_refl((Solver_setup.Visibility_matrix(:, n) == 2), 1, refl_num-1);
+            Isol_neg((Solver_setup.Visibility_matrix(:, n) == 4)) = Isol_refl((Solver_setup.Visibility_matrix(:, n) == 4), 2, refl_num-1);
+            H_vec_pos(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_pos);
+            H_vec_neg(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_neg);
         end
-        toc
-        Isol = Isol + Isol_refl;
+        Isol_refl(:, :, refl_num) = [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
     end
+    Isol = sum(Isol_refl, 3);
     
     % End timing (MoM factorisation)
     po.factorisationTime(freq) = toc;
@@ -179,7 +182,7 @@ for freq=1:numFreq
     po.totsolTime = po.totsolTime + po.solTime(freq);
     
 end%for freq=1:numFreq
-po.Isol = po.Isol + Isol(:, 1).*BF_side(:, 1);
+po.Isol = Isol(:, 1).*BF_side(:, 1);
 po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
 %po.Isol = Isol(:, 1) + Isol(:, 2);
 

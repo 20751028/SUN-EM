@@ -1,0 +1,1 @@
+ -n 4 -localonly -localhost MSI -envall -mapall "D:\Program Files\Altair\2019\FEKO\bin\feko_mkl.csv.impi.exe" "reflectorRT1G_rev" "--run-from-gui" "--use-gpu"

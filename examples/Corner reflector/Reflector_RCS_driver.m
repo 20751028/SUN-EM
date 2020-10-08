@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflectorRT1G.mat';
-Const.FEKOstrfilename          = 'reflectorRT1G.str';
-Const.FEKOrhsfilename          = 'reflectorRT1G.rhs';
-Const.FEKOoutfilename          = 'reflectorRT1G.out';
+Const.FEKOmatfilename          = 'reflectorRT1G_rev.mat';
+Const.FEKOstrfilename          = 'reflectorRT1G_rev.str';
+Const.FEKOrhsfilename          = 'reflectorRT1G_rev.rhs';
+Const.FEKOoutfilename          = 'reflectorRT1G_rev.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -37,7 +37,7 @@ Const.FEKOoutfilename          = 'reflectorRT1G.out';
 % --------------------------------------------------------------------------------------------------
 % Read the MoM matrix equation from the file
 % --------------------------------------------------------------------------------------------------
-%[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
+[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
 yVectors.numRhs = xVectors.numMoMbasis;
 Const = sunem_init(Const, yVectors);
 
@@ -46,7 +46,7 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % TO-DO: At a later stage we can also add other meshing / geometry
 % preprocessxing, e.g. Gmsh or GiD. For now the solver setup is read from FEKO.
-%[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
+[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
 
 
 % --------------------------------------------------------------------------------------------------
@@ -55,11 +55,13 @@ Const = sunem_init(Const, yVectors);
 theta_grid = 10:0.5:170;
 phi_grid = 0:1:0;
 
+%Set number of reflections for MRPO
+Solver_setup.num_reflections = 3;
+
 num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);
 total_efield_samples = num_theta_samples*num_phi_samples;
 Efield_magnitude = zeros(total_efield_samples,1);
-Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
 %calculate the monostatic RCS
 RCS = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors);
 
