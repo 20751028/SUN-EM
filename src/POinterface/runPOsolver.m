@@ -139,14 +139,6 @@ for freq=1:numFreq
     a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
     H_vec = H*a_phi;
     Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
-
-%     H = complex(zeros(100, 3));
-%     for n = 1:100
-%         H(n,:) = calculateHfieldAtPointRWGCart(Const, [n/100-0.01, 0, 0], Solver_setup, Isol(:, 2));
-%     end
-%     figure
-%     plot(0:99, H(:, 2));
-    
     
     Isol_refl = complex(zeros(Npo, 2, Solver_setup.num_reflections));
     Isol_refl(:, :, 1) = Isol;
@@ -188,21 +180,6 @@ po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
 
 message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 
-% Compare the MoM solution obtained with MATLAB, with that obtained by FEKO
-% that was stored in xVectors.values (for each frequency iteration (and each solution within the frequency iteration)
-% Calculate also space for the relative error here
-% po.relError = zeros(1,po.numSols);
-% for freq=1:numFreq
-%     for solNum=1:numRHSperFreq
-%         index = solNum + (freq-1)*numRHSperFreq;
-%         po.relError(index) = calculateErrorNormPercentage(refIsol.Isol(1:Solver_setup.num_metallic_edges,index), po.Isol(:,index));
-%         message_fc(Const,sprintf('Rel. error norm. for Sol. %d of %d of freq. %d of %d compared to reference sol. %f percent',solNum, ...
-%             numRHSperFreq, freq, numFreq, po.relError(index)));
-%     end
-% end
-
-% Write the MoM solution to a ASCII str file, so that it can be read
-% again by FEKO (for plotting in POSTFEKO) - only if requested (i.e. if the filename is defined)
 if (~isempty(Const.SUNEMmomstrfilename))
     writeSolToFile(Const, po);
 end%if
