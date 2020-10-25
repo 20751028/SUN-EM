@@ -157,9 +157,11 @@ for freq=1:numFreq
             H_vec_pos(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_pos);
             H_vec_neg(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_neg);
         end
+        %Isol_refl(:, :, refl_num) = Isol_refl(:, :, refl_num-1) + [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
         Isol_refl(:, :, refl_num) = [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
     end
     Isol = sum(Isol_refl, 3);
+    %Isol = Isol_refl(:, :, refl_num);
     
     % End timing (MoM factorisation)
     po.factorisationTime(freq) = toc;

@@ -35,7 +35,7 @@ Solver_setup.r_bounding = getBoundingRadius(Solver_setup);
 index = 0;
 RCS = zeros(length(theta_grid)*length(phi_grid), 2);
 Raytracer.setGeom(Solver_setup);
-Solver_setup.Visibility_matrix = 1;%selfShadow(Solver_setup);
+Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
 
 for theta_degrees = theta_grid
     for phi_degrees = phi_grid
