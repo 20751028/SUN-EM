@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflectorRT1G_rev.mat';
-Const.FEKOstrfilename          = 'reflectorRT1G_rev.str';
-Const.FEKOrhsfilename          = 'reflectorRT1G_rev.rhs';
-Const.FEKOoutfilename          = 'reflectorRT1G_rev.out';
+Const.FEKOmatfilename          = 'Pol_test_2_VV_HH_thin_wedge_variable.mat';
+Const.FEKOstrfilename          = 'Pol_test_2_VV_HH_thin_wedge_variable.str';
+Const.FEKOrhsfilename          = 'Pol_test_2_VV_HH_thin_wedge_variable.rhs';
+Const.FEKOoutfilename          = 'Pol_test_2_VV_HH_thin_wedge_variable.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -52,11 +52,11 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % Set up a number of frames to be run (ie one per incident angle)
 % --------------------------------------------------------------------------------------------------
-theta_grid = 10:0.5:170;
-phi_grid = 0:1:0;
+theta_grid = 90:2:90;
+phi_grid = 0:1:10;
 
 %Set number of reflections for MRPO
-Solver_setup.num_reflections = 3;
+Solver_setup.num_reflections = 2;
 
 num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);
@@ -64,14 +64,15 @@ total_efield_samples = num_theta_samples*num_phi_samples;
 Efield_magnitude = zeros(total_efield_samples,1);
 %calculate the monostatic RCS
 RCS = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors);
-RCS_mag = sum(RCS, 2);
 
 % Plot the RCS
 figure;
 hold on;
 grid on;
 
-plot(1:total_efield_samples,10*log10(RCS_mag));
+plot(1:total_efield_samples,10*log10(RCS(:, 1)));
+plot(1:total_efield_samples,10*log10(RCS(:, 2)));
+legend('VV', 'VH');
 set(get(gca, 'XLabel'), 'String', ('Sample index'));
 set(get(gca, 'YLabel'), 'String', ('RCS [dBsm]'));
 

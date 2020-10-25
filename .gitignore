@@ -29,3 +29,14 @@ SimOutput.log
 *.hfe
 *.zip
 *.vis
+examples/cruise_missile/Cruise_missile.cfm
+examples/cruise_missile/Cruise_missile.cfx
+examples/cruise_missile/Cruise_missile_CSIR_v2_fine.cfm
+examples/cruise_missile/Cruise_missile_CSIR_v2_fine.cfx
+examples/cruise_missile/Cruise_missile_CSIR_v2_GO.cfx
+examples/cruise_missile/Cruise_missile_CSIR_v2_MLFMM.cfx
+examples/cruise_missile/Cruise_missile_MLFMM.cfm
+examples/cruise_missile/Cruise_missile_MLFMM.cfx
+examples/cruise_missile/Cruise_missile_no_gpu.cfm
+examples/cruise_missile/Cruise_missile_no_gpu.cfx
+examples/cruise_missile/makarov_test.pdf

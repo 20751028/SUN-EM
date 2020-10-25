@@ -131,12 +131,14 @@ for freq=1:numFreq
     nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
     delta = -nDotRay./abs(nDotRay).*visible;
     BF_side = [delta > 0.017, delta < -0.017];
+    delta(isnan(delta)) = 0;
     
     k = 2*pi*Solver_setup.frequencies.samples(freq)/Const.C0;
     [kx, ky, kz] = sph2cart(Solver_setup.phi*Const.DEG2RAD, (90-Solver_setup.theta)*Const.DEG2RAD, -k);
     k_vec = repmat([kx, ky, kz], [Npo, 1]);
-    H = (1/Const.ETA_0)*exp(1j*(dot(k_vec, rn, 2)));    %Find impressed H field (r directed plane wave with E field theta-polarised)
+    H = (1/Const.ETA_0)*exp(1j*(dot(k_vec, rn, 2)));    %Find impressed H field (-r directed plane wave with E field theta-polarised)
     a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
+    a_theta = -[cosd(Solver_setup.theta)*cosd(Solver_setup.phi), cosd(Solver_setup.theta)*sind(Solver_setup.phi), -sind(Solver_setup.theta)];
     H_vec = H*a_phi;
     Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
     
@@ -176,7 +178,6 @@ for freq=1:numFreq
 end%for freq=1:numFreq
 po.Isol = Isol(:, 1).*BF_side(:, 1);
 po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
-%po.Isol = Isol(:, 1) + Isol(:, 2);
 
 message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 

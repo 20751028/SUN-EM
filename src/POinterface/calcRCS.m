@@ -33,9 +33,9 @@ r = 100000;
 Solver_setup.r_bounding = getBoundingRadius(Solver_setup);
 % Calculate now the E-field value here internal
 index = 0;
-RCS = zeros(length(theta_grid)*length(phi_grid), 1);
+RCS = zeros(length(theta_grid)*length(phi_grid), 2);
 Raytracer.setGeom(Solver_setup);
-Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
+Solver_setup.Visibility_matrix = 1;%selfShadow(Solver_setup);
 
 for theta_degrees = theta_grid
     for phi_degrees = phi_grid
@@ -82,7 +82,10 @@ for theta_degrees = theta_grid
         Efield_magnitude = sqrt(abs(EfieldAtPointSpherical(1))^2 + ...
             abs(EfieldAtPointSpherical(2))^2 + ...
             abs(EfieldAtPointSpherical(3))^2);
-        RCS(index) = 4*pi*(r.*(Efield_magnitude))^2;
+        E_theta = abs(EfieldAtPointSpherical(2));
+        E_phi = abs(EfieldAtPointSpherical(3));
+        RCS(index, 1) = 4*pi*(r.*(E_theta))^2;
+        RCS(index, 2) = 4*pi*(r.*(E_phi))^2;
     end%for
 end%for
 

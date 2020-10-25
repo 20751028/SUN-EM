@@ -23,10 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflectorRT1G_rev.mat';
-Const.FEKOstrfilename          = 'reflectorRT1G_rev.str';
-Const.FEKOrhsfilename          = 'reflectorRT1G_rev.rhs';
-Const.FEKOoutfilename          = 'reflectorRT1G_rev.out';
+Const.FEKOmatfilename          = 'cruise_missile.mat';
+Const.FEKOstrfilename          = 'cruise_missile.str';
+Const.FEKOrhsfilename          = 'cruise_missile.rhs';
+Const.FEKOoutfilename          = 'cruise_missile.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -37,7 +37,7 @@ Const.FEKOoutfilename          = 'reflectorRT1G_rev.out';
 % --------------------------------------------------------------------------------------------------
 % Read the MoM matrix equation from the file
 % --------------------------------------------------------------------------------------------------
-[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
+%[xVectors] = readFEKOXvectorFromFile(Const, Const.FEKOstrfilename);
 yVectors.numRhs = xVectors.numMoMbasis;
 Const = sunem_init(Const, yVectors);
 
@@ -46,14 +46,14 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % TO-DO: At a later stage we can also add other meshing / geometry
 % preprocessxing, e.g. Gmsh or GiD. For now the solver setup is read from FEKO.
-[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
+%[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
 
 
 % --------------------------------------------------------------------------------------------------
 % Set up a number of frames to be run (ie one per incident angle)
 % --------------------------------------------------------------------------------------------------
-theta_grid = 10:0.5:170;
-phi_grid = 0:1:0;
+theta_grid = 45:1:90;
+phi_grid = 45:1:180;
 
 %Set number of reflections for MRPO
 Solver_setup.num_reflections = 3;
