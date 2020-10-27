@@ -23,12 +23,10 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'plate2.mat';
-Const.FEKOstrfilename          = 'plate2.str';
-Const.FEKOrhsfilename          = 'plate2.rhs';
-Const.FEKOoutfilename          = 'plate2.out';
-Const.FEKOefefilename          = 'plate2_NearField1.efe';
-Const.FEKOffefilename          = 'plate2.ffe';
+Const.FEKOmatfilename          = 'disc.mat';
+Const.FEKOstrfilename          = 'disc.str';
+Const.FEKOrhsfilename          = 'disc.rhs';
+Const.FEKOoutfilename          = 'disc.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -48,13 +46,13 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 % TO-DO: At a later stage we can also add other meshing / geometry
 % preprocessxing, e.g. Gmsh or GiD. For now the solver setup is read from FEKO.
-[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
+%[Const, Solver_setup] = parseFEKOoutfile(Const, 0);
 
 
 % --------------------------------------------------------------------------------------------------
 % Set up a number of frames to be run (ie one per incident angle)
 % --------------------------------------------------------------------------------------------------
-theta_grid = -90:0.5:90;
+theta_grid = 0:1:0;
 phi_grid = 0:1:0;
 
 %Set number of reflections for MRPO (1 for SRPO)
@@ -77,4 +75,13 @@ grid on;
 plot(1:total_efield_samples,10*log10(RCS_mag));
 set(get(gca, 'XLabel'), 'String', ('Sample index'));
 set(get(gca, 'YLabel'), 'String', ('RCS [dBsm]'));
+
+figure;
+
+plot(theta_grid, 10*log10(RCS_mag))
+hold on
+grid on
+title('Total RCS')
+xlabel('\theta/\circ')
+ylabel('RCS/dBsm')
 

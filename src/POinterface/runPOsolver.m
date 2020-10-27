@@ -51,6 +51,8 @@ po.numSols = 1; %numSols;                     % For now, set to 1. (TO-DO: Updat
 numFreq = Solver_setup.frequencies.freq_num;   % The number of frequency points to process
 numRHSperFreq = po.numSols / numFreq;         % The number of solutions per frequency point.
 % For now, should be 1 (TO-DO: Update)
+numFreq = 11;
+Solver_setup.frequencies.samples = 0.5E9:0.25E9:3E9;
 
 % Some info about the solution configurations
 % message_fc(Const,sprintf('  numSols : %d', po.numSols));
@@ -88,6 +90,7 @@ visible = visible(1:Npo);
 %axis('equal');
 
 % Start the frequency loop now
+Isol = complex(zeros(numFreq, Npo));
 for freq=1:numFreq
     
     % Start timing (PO setup)
@@ -140,10 +143,11 @@ for freq=1:numFreq
     a_phi = [-sind(Solver_setup.phi), cosd(Solver_setup.phi), 0];
     a_theta = -[cosd(Solver_setup.theta)*cosd(Solver_setup.phi), cosd(Solver_setup.theta)*sind(Solver_setup.phi), -sind(Solver_setup.theta)];
     H_vec = H*a_phi;
-    Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
+    %Isol = repmat(dot(2*delta.*H_vec, ln, 2), [1, 2]).*BF_side;
+    Isol(freq, :) = dot(2*delta.*H_vec, ln, 2);
     
     Isol_refl = complex(zeros(Npo, 2, Solver_setup.num_reflections));
-    Isol_refl(:, :, 1) = Isol;
+%    Isol_refl(:, :, 1) = Isol;
     for refl_num = 2:Solver_setup.num_reflections
         H_vec_pos = zeros(Npo, 3);
         H_vec_neg = zeros(Npo, 3);
@@ -160,7 +164,7 @@ for freq=1:numFreq
         %Isol_refl(:, :, refl_num) = Isol_refl(:, :, refl_num-1) + [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
         Isol_refl(:, :, refl_num) = [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
     end
-    Isol = sum(Isol_refl, 3);
+    %Isol = sum(Isol_refl, 3);
     %Isol = Isol_refl(:, :, refl_num);
     
     % End timing (MoM factorisation)
@@ -178,8 +182,9 @@ for freq=1:numFreq
     po.totsolTime = po.totsolTime + po.solTime(freq);
     
 end%for freq=1:numFreq
-po.Isol = Isol(:, 1).*BF_side(:, 1);
-po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
+%po.Isol = Isol(:, 1).*BF_side(:, 1);
+%po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
+po.Isol = Isol;
 
 message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
 

@@ -1,0 +1,101 @@
+Altair Feko - ADAPTFEKO Version 2019.1-10 from 2019-02-13
+AFO file format: 3
+
+Global frequency band:
+ Start [Hz] =   5.000000000000e+08
+ Stop  [Hz] =   3.000000000000e+09
+Captions:
+Pactive (sol=1)                                                                                      Coefficients 1
+Ploss   (sol=1)                                                                                      Coefficients 2
+Antenna Efficiency (sol=1)                                                                           Coefficients 3
+Relative Phase of Received Signal (sol=1)                                                            Coefficients 4
+beta top                                                                                             Coefficients 5
+beta bot                                                                                             Coefficients 6
+FF (0.00,0.00)                                                                   ANREG = 2           Coefficients 7,8,9,10
+powerint (sol=1)                                                                                     Coefficients 11
+RG_FACTOR (sol=1)                                                                                    Coefficients 12
+Frequency blocks:
+ Fstart [Hz] =   5.000000000000e+08
+ Fstop  [Hz] =   3.000000000000e+09
+ Converged            = 1 
+ Order of numerator   = -1
+ Order of denominator = 18
+ Discrete frequency points:
+   5.000000000000e+08
+   6.470588235294e+08
+   7.941176470588e+08
+   9.411764705882e+08
+   1.088235294118e+09
+   1.235294117647e+09
+   1.382352941176e+09
+   1.529411764706e+09
+   1.676470588235e+09
+   1.823529411765e+09
+   1.970588235294e+09
+   2.117647058824e+09
+   2.264705882353e+09
+   2.411764705882e+09
+   2.558823529412e+09
+   2.705882352941e+09
+   2.852941176471e+09
+   3.000000000000e+09
+ Coefficients 1, Pactive (sol=1)
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 2, Ploss   (sol=1)
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 3, Antenna Efficiency (sol=1)
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 4, Relative Phase of Received Signal (sol=1)
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 5, beta top 
+   Order of coefficient = 2
+   1.047922510975e+01   0.000000000000e+00
+   1.908538063696e-02   0.000000000000e+00
+ Coefficients 6, beta bot  
+   Order of coefficient = 2
+   1.047922510975e+01   0.000000000000e+00
+   1.908538063696e-02   0.000000000000e+00
+ Coefficients 7, Et (0.00,0.00)                                                                   ANREG = 2
+   Order of coefficient = 2
+   1.309767422082e-08   1.309767435180e+00
+   1.526988628882e-09  -1.526988644152e-01
+ Coefficients 8, Ep (0.00,0.00)                                                                   ANREG = 2
+   Order of coefficient = 18
+   1.309767422082e-08   1.309767425177e-08
+   7.634943288468e+06  -7.634943297110e+06
+  -8.912147953988e+01   0.000000000000e+00
+   7.678998803672e-04   6.217871984586e-11
+   2.479388175703e+01  -6.880894208308e-02
+  -2.882727683410e-02  -9.726672391740e-04
+   1.784610657651e+00  -5.207091182292e-02
+   4.102947201823e-02   9.084573594448e-04
+   6.613871142208e+00   9.892906482687e-02
+  -5.748544718031e-03   4.862728868898e-05
+  -2.314000682450e+01  -9.450323675290e-02
+  -2.513478489665e-02   1.737632613712e-04
+   1.076763268750e+01   2.963658699267e-01
+  -7.219860791703e-03   2.469413010141e-04
+   9.045897680364e+00   4.833259369927e-01
+   4.500178247784e-03  -3.511013442120e-04
+   2.155468885354e-01  -1.535727215429e-01
+  -4.851853136360e-03   1.383054939598e-04
+ Coefficients 9, f1 (0.00,0.00)                                                                   ANREG = 2
+   Order of coefficient = 1
+   1.256637061436e+01   0.000000000000e+00
+ Coefficients 10, f2 (0.00,0.00)                                                                   ANREG = 2
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 11, powerint (sol=1) 
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+ Coefficients 12, RG_FACTOR (sol=1) 
+   Order of coefficient = 1
+   0.000000000000e+00   0.000000000000e+00
+
+
+---------------------------------------------------------------
+
