@@ -39,7 +39,6 @@ if(Solver_setup.num_reflections > 1)
     Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
 end
 
-        numFreq = Solver_setup.frequencies.freq_num;
 for theta_degrees = theta_grid
     for phi_degrees = phi_grid
         
@@ -52,13 +51,13 @@ for theta_degrees = theta_grid
         %         tic;
         %         [Vpp Vpn Vnp Vnn] = selfShadow(Solver_setup);
         %         toc;
-        f = 0.5E9:0.25E9:3E9;
-        for freq = 1:11
-Solver_setup.frequencies.samples = f(freq);
+       % f = 0.5E9:0.25E9:3E9;
+       % for freq = 1:11
+%Solver_setup.frequencies.samples = f(freq);
         index = index + 1;
         [Solution] = runEMsolvers(Const, Solver_setup, 0, 0, xVectors);
         EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, theta_degrees, phi_degrees, ...
-            Solver_setup, Solution.PO.Isol(freq, :));
+            Solver_setup, Solution.PO.Isol);
         
 %                 HfieldAtPointSpherical = zeros(10/0.01+1, 3);
 %                 r_obs = 0:0.001:1;
@@ -80,8 +79,8 @@ Solver_setup.frequencies.samples = f(freq);
 %                 xlabel('Z/m');
 %                 ylabel('H/dBA/m');
         
-        %relError = calculateErrorNormPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
-        %message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
+        relError = calculateErrorNormttPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
+        message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
         
         % Calculate now the magnitude of the E-field vector.
         Efield_magnitude = sqrt(abs(EfieldAtPointSpherical(1))^2 + ...
@@ -91,7 +90,7 @@ Solver_setup.frequencies.samples = f(freq);
         E_phi = abs(EfieldAtPointSpherical(3));
         RCS(index, 1) = 4*pi*(r.*(E_theta))^2;
         RCS(index, 2) = 4*pi*(r.*(E_phi))^2;
-        end
+       % end
     end%for
 end%for
 
