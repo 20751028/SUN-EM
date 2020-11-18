@@ -23,10 +23,8 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'cruise_missile_MLFMM.mat';
-Const.FEKOstrfilename          = 'cruise_missile_MLFMM.str';
-Const.FEKOrhsfilename          = 'cruise_missile_MLFMM.rhs';
-Const.FEKOoutfilename          = 'cruise_missile_MLFMM.out';
+Const.FEKOstrfilename          = 'cruise_missile_new.str';
+Const.FEKOoutfilename          = 'cruise_missile_new.out';
 
 % The Following file is used to port solutions to FEKO 
 % (for post-processing in POSTFEKO).
@@ -55,8 +53,13 @@ Const = sunem_init(Const, yVectors);
 theta_grid = 90:1:90;
 phi_grid = 0:1:180;
 
+%Setup for bistatic case
+Solver_setup.is_bistatic = true;
+Solver_setup.phi_bistatic = 30;
+Solver_setup.theta_bistatic = 0;
+
 %Set number of reflections for MRPO
-Solver_setup.num_reflections = 5;
+Solver_setup.num_reflections = 3;
 
 num_theta_samples = length(theta_grid);
 num_phi_samples = length(phi_grid);

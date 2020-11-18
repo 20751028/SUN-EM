@@ -1,35 +1,29 @@
-function [rays] = setRays(Solver_setup)
+function [rays] = setRays(Solver_setup, theta_degrees, phi_degrees)
 %setRays
 %   Usage:
-%       [rays] = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors)
+%       [rays] = setRays(Solver_setup, theta_degrees, phi_degrees)
 %   Input Arguments:
-%       Const
-%           A global struct, containing general data
 %       Solver_setup
 %           Solver specific struct, e.g. frequency range, basis function details, geometry details
-%       r
-%           Distance to viewport
+%       theta_degres, phi_degrees
+%           spherical coordinates for the observation angle
 %
 %   Output Arguments:
 %       rays
 %           Structure containing the origin and direction of each ray
 %
 %   Description:
-%       Sets up a uniform grid of rays at the viewport directed in the
-%       incident direction
+%       Sets up a uniform grid of rays at the viewport directed from
+%       (theta_degreed, phi_degrees).
 %
 %   =======================
 %   Written by Cullen Stewart-Burger on 1 Sept 2020
 %   Stellenbosch University
 %   Email: 20751028@sun.ac.za
 
-%get U and V vectors for incident plane
-%a_phi = [-sin(Solver_setup.phi*Const.DEG2RAD), cos(Solver_setup.phi*Const.DEG2RAD), 0];
-%a_theta = [cosd(Solver_setup.phi)*cosd(Solver_setup.theta), cosd(Solver_setup.phi)*sind(Solver_setup.theta), -sind(Solver_setup.theta)];
-
 %For now we project all the centre points onto the plane
 pt = Solver_setup.triangle_centre_point;
-[norm(1), norm(2), norm(3)] = sph2cart(Solver_setup.phi*pi/180, pi/2-Solver_setup.theta*pi/180, 1);
+[norm(1), norm(2), norm(3)] = sph2cart(phi_degrees*pi/180, pi/2-theta_degrees*pi/180, 1);
 norm = -norm;
 N = size(pt,1);
 norm_mat = repmat(norm,[N 1]);

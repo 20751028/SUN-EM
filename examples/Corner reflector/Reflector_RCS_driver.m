@@ -23,9 +23,7 @@ Const.runPOsolver              = true;
 % --------------------------------------------------------------------------------------------------
 % Define input files for extracting FEKO data
 % --------------------------------------------------------------------------------------------------
-Const.FEKOmatfilename          = 'reflectorRT1G_rev.mat';
 Const.FEKOstrfilename          = 'reflectorRT1G_rev.str';
-Const.FEKOrhsfilename          = 'reflectorRT1G_rev.rhs';
 Const.FEKOoutfilename          = 'reflectorRT1G_rev.out';
 
 % The Following file is used to port solutions to FEKO 
@@ -54,6 +52,11 @@ Const = sunem_init(Const, yVectors);
 % --------------------------------------------------------------------------------------------------
 theta_grid = 10:0.5:170;
 phi_grid = 0:1:0;
+%Setup for bistatic case
+Solver_setup.is_bistatic = true;
+Solver_setup.phi_bistatic = 0;
+Solver_setup.theta_bistatic = -10;
+
 
 %Set number of reflections for MRPO
 Solver_setup.num_reflections = 3;

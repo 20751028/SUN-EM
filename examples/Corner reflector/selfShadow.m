@@ -12,17 +12,12 @@ function Visibility_matrix = selfShadow(Solver_setup)
 %  for generalised surfaces, we need something more sophisticated
 %      consider replicating all the geometry as "inner" and "outer" surfaces
 %      in this case, we need to follow the process above (except RT which can be done once) with four seperate cases:
-%      !!check below!!
-%      outside BF to outside centroids - ray and normal same direction angle > 90 = solid
-%      outside BF to inside centroid - ray and normal same dir = solid
-%      inside BF to outside centroid - ray and normal 
-%      inside BF to inside centroid - ray and normal
+%      outside BF to outside centroids
+%      outside BF to inside centroid
+%      inside BF to outside centroid 
+%      inside BF to inside centroid
 
-%set up visibility matrix functions
-% Vpp = logical(sparse(Solver_setup.num_mom_basis_functions, Solver_setup.num_mom_basis_functions));
-% Vpn = logical(sparse(Solver_setup.num_mom_basis_functions, Solver_setup.num_mom_basis_functions));
-% Vnp = logical(sparse(Solver_setup.num_mom_basis_functions, Solver_setup.num_mom_basis_functions));
-% Vnn = logical(sparse(Solver_setup.num_mom_basis_functions, Solver_setup.num_mom_basis_functions));
+%set up visibility matrix
 Visibility_matrix = zeros(Solver_setup.num_mom_basis_functions, Solver_setup.num_mom_basis_functions, 'uint8');
 
 %Before running visibility tests, we need to construct an outward facing

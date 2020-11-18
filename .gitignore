@@ -42,3 +42,9 @@ examples/cruise_missile/Cruise_missile_no_gpu.cfx
 examples/cruise_missile/makarov_test.pdf
 examples/cruise_missile/Cruise_missile_new.cfm
 examples/cruise_missile/Cruise_missile_new.cfx
+examples/cruise_missile/Cruise_missile_bistatic.cfx
+examples/cruise_missile/Cruise_missile_bistatic.cfm
+examples/cruise_missile/Cruise_missile_new_SRPO.cfm
+examples/cruise_missile/Cruise_missile_new_SRPO.cfx
+examples/cruise_missile/Cruise_missile_MLFMM_bistatic.cfx
+examples/cruise_missile/Cruise_missile_MLFMM_bistatic.cfm

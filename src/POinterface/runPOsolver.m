@@ -8,33 +8,23 @@ function [po] = runPOsolver(Const, Solver_setup, ~, ~, refIsol)
 %       Const
 %           A global struct, containing general data
 %       Solver_setup
-%           Solver specific struct, e.g. frequency range, basis function details, geometry details
-%       zMatrices
-%           The Z-matrices data. This can be from FEKO (extracted from the *.mat file, or internally
-%           calculated).
-%       yVectors
-%           The Yrhs-vector data
+%           Solver specific struct, e.g. frequency range, basis function
+%           details, geometry details, aspect angles
 %       refIsol
-%           The reference solution-vector data (e.g. MoM solution of FEKO or SUN-EM)
+%           The reference solution-vector data (e.g. PO solution of FEKO or SUN-EM)
 %
 %   Output Arguments:
 %       po
 %           Structs containing PO solution and timing data
 %
 %   Description:
-%       Runs the PO solution based on the Z and Y data that was read / parsed
-%       from the FEKO *.out, *.mat, *.str and *.rhs files
+%       Calculates the PO solution based on the Z and Y data that was read / parsed
+%       from the FEKO *.out fiel
 %
 %   =======================
 %   Written by Cullen Stewart-Burger on 27 July 2020
-%   Adapted from runMoMsolver.m by Danie Ludick
 %   Stellenbosch University
 %   Email: 20751028@sun.ac.za
-
-%   indev notes (28/07/2020):
-%       Current implementation assumes fully illuminated target
-%       Excitation source is set to a unit phi-polarised plane wave
-%       travelling in -r direction.
 
 narginchk(5,5);
 
@@ -46,18 +36,9 @@ message_fc(Const,sprintf('Running PO solver'));
 po  = [];
 po.name = 'po';
 Npo = Solver_setup.num_mom_basis_functions;   % Total number of basis functions for whole problem
-%numSols = xVectors.numSols;                   % The number of solutions configurations
 po.numSols = 1; %numSols;                     % For now, set to 1. (TO-DO: Update)
 numFreq = Solver_setup.frequencies.freq_num;   % The number of frequency points to process
 numRHSperFreq = po.numSols / numFreq;         % The number of solutions per frequency point.
-% For now, should be 1 (TO-DO: Update)
-%numFreq = 11;
-%Solver_setup.frequencies.samples = 0.5E9:0.25E9:3E9;
-
-% Some info about the solution configurations
-% message_fc(Const,sprintf('  numSols : %d', po.numSols));
-% message_fc(Const,sprintf('  numFreq : %d', numFreq));
-% message_fc(Const,sprintf('  numRHSperFreq : %d', numRHSperFreq));
 
 % Calculate the solution vector (observable BFs only)
 po.Isol = complex(zeros(Npo,1));
@@ -68,12 +49,11 @@ Isol = complex(zeros(Npo,2));
 po.setupTime = zeros(1,numFreq);
 % Zero also the total times (for all frequency iterations)
 po.totsetupTime = 0.0;
-po.totfactorisationTime = 0.0;
 po.totsolTime = 0.0;
 
 
 %Test to see which basis functions are illuminated
-ray = setRays(Solver_setup);
+ray = setRays(Solver_setup, Solver_setup.theta, Solver_setup.phi);
 [tri_id, dist] = Raytracer.intersect_rays(ray);
 [tp, ~, itp] = unique(Solver_setup.rwg_basis_functions_trianglePlus);
 [tm, ~, itm] = unique(Solver_setup.rwg_basis_functions_triangleMinus);
@@ -100,13 +80,6 @@ for freq=1:numFreq
     solStart = 1;
     solEnd   = numRHSperFreq;
     
-    %         % Allocate here space for the MoM matrix so that it can be filled
-    %         ObservRWGs = [1:Npo];
-    %         SourceRWGs = [1:Npo];
-    %         % Note: Since 2017-06-25, we are also passing a freq. variable here to
-    %         % indicate for which frequency point we are extracting the matrix
-    %         Zmom = (calcZmn(Const, zMatrices, freq, 1, 1, ObservRWGs, SourceRWGs));
-    
     % End timing (calculating the impedance matrix)
     po.setupTime(freq) = toc;
     
@@ -132,8 +105,9 @@ for freq=1:numFreq
     %visible or +-1 depending on the incident direction relative to the
     %surface normal.
     nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
-    %delta = -nDotRay./abs(nDotRay).*visible;
-    delta = -nDotRay./abs(nDotRay);
+    delta = -nDotRay./abs(nDotRay).*visible;
+    %delta = -nDotRay./abs(nDotRay); %uncomment this line to use the full
+    %illumination assumption
     BF_side = [delta > 0.017, delta < -0.017];
     delta(isnan(delta)) = 0;
     
@@ -162,34 +136,46 @@ for freq=1:numFreq
             H_vec_pos(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_pos);
             H_vec_neg(n, :) = calculateHfieldAtPointRWGCart(Const, rn(n, :), Solver_setup, Isol_neg);
         end
-        %Isol_refl(:, :, refl_num) = Isol_refl(:, :, refl_num-1) + [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
         Isol_refl(:, :, refl_num) = [dot(2*conj(H_vec_pos), ln, 2)  dot(-2*conj(H_vec_neg), ln, 2)];
     end
     Isol = sum(Isol_refl, 3);
-    %Isol = Isol_refl(:, :, refl_num);
     
-    % End timing (MoM factorisation)
-    po.factorisationTime(freq) = toc;
-    
-    % Total time (MoM matrix setup + factorisation)
-    po.solTime(freq) = po.setupTime(freq) + po.factorisationTime(freq);
     
     % Memory usage remains constant between frequency iterations
-    po.memUsage = byteSize(Solver_setup.Visibility_matrix);
+    %po.memUsage = byteSize(Solver_setup.Visibility_matrix);
     
-    % Calculate the total MoM times
-    po.totsetupTime = po.totsetupTime + po.setupTime(freq);
-    po.totfactorisationTime = po.totfactorisationTime + po.factorisationTime(freq);
-    po.totsolTime = po.totsolTime + po.solTime(freq);
     
 end%for freq=1:numFreq
+
+if(Solver_setup.is_bistatic)
+    %Test to see which basis functions are visible from the reciever
+    theta = Solver_setup.theta + Solver_setup.theta_bistatic;
+    phi = Solver_setup.phi + Solver_setup.phi_bistatic;
+    ray = setRays(Solver_setup, theta, phi);
+    [tri_id, dist] = Raytracer.intersect_rays(ray);
+    [tp, ~, itp] = unique(Solver_setup.rwg_basis_functions_trianglePlus);
+    [tm, ~, itm] = unique(Solver_setup.rwg_basis_functions_triangleMinus);
+    [~, i_vis_pos, ~] = intersect(tp, tri_id);
+    [~, i_vis_neg, ~] = intersect(tm, tri_id);
+    tp(i_vis_pos) = -1;
+    vis_pos = (tp(itp)==-1);
+    tp(i_vis_neg) = -1;
+    vis_neg = (tp(itm)==-1);
+    visible = vis_pos & vis_neg;
+    visible = visible(1:Npo);
+    
+    %Test which side of each basis function is visible
+    nDotRay = dot(Solver_setup.triangle_normal_vector(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), ray.dir(Solver_setup.rwg_basis_functions_trianglePlus(1:Npo), :), 2);
+    delta = -nDotRay./abs(nDotRay).*visible;
+    BF_side = [delta > 0.017, delta < -0.017];
+end
+
+
 po.Isol = Isol(:, 1).*BF_side(:, 1);
 po.Isol = po.Isol + Isol(:, 2).*BF_side(:, 2);
-%po.Isol = Isol;
+po.totsolTime = toc;
 
-message_fc(Const,sprintf('Finished PO solver in %f sec.',po.totsolTime));
+message_fc(Const,sprintf('Finished PO solver in %f sec.', po.totsolTime));
 
-if (~isempty(Const.SUNEMmomstrfilename))
-    writeSolToFile(Const, po);
-end%if
+
 

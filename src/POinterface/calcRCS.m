@@ -13,7 +13,7 @@ function [RCS] = calcRCS(Const, Solver_setup, theta_grid, phi_grid, xVectors)
 %       phi_grid
 %           List of phi incident angles
 %       xVectors
-%           The reference solution-vector data (e.g. MoM solution of FEKO or SUN-EM)
+%           The reference solution-vector data (e.g. PO solution of FEKO or SUN-EM)
 %
 %   Output Arguments:
 %       RCS
@@ -36,9 +36,9 @@ index = 0;
 RCS = zeros(length(theta_grid)*length(phi_grid), 2);
 Raytracer.setGeom(Solver_setup);
 if(Solver_setup.num_reflections > 1)
-    Solver_setup.Visibility_matrix = selfShadow(Solver_setup);
+    Solver_setup.Visibility_matrix = selfShadow(Solver_setup); 
+    memUsage = byteSize(Solver_setup.Visibility_matrix);
 end
-
 for theta_degrees = theta_grid
     for phi_degrees = phi_grid
         
@@ -48,38 +48,22 @@ for theta_degrees = theta_grid
         % --------------------------------------------------------------------------------------------------
         % Run the EM solver
         % --------------------------------------------------------------------------------------------------
-        %         tic;
-        %         [Vpp Vpn Vnp Vnn] = selfShadow(Solver_setup);
-        %         toc;
-       % f = 0.5E9:0.25E9:3E9;
-       % for freq = 1:11
-%Solver_setup.frequencies.samples = f(freq);
         index = index + 1;
         [Solution] = runEMsolvers(Const, Solver_setup, 0, 0, xVectors);
-        EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, theta_degrees, phi_degrees, ...
+        
+        %Change reviever position for bistatic case
+        if(Solver_setup.is_bistatic)
+            reciever_theta_degrees = theta_degrees + Solver_setup.theta_bistatic;
+            reciever_phi_degrees = phi_degrees + Solver_setup.phi_bistatic;
+        else
+            reciever_theta_degrees = theta_degrees;
+            reciever_phi_degrees = phi_degrees;
+        end
+        
+        EfieldAtPointSpherical =  calculateEfieldAtPointRWG(Const, r, reciever_theta_degrees, reciever_phi_degrees, ...
             Solver_setup, Solution.PO.Isol);
         
-%                 HfieldAtPointSpherical = zeros(10/0.01+1, 3);
-%                 r_obs = 0:0.001:1;
-%                 for ind = 1:1001
-%                     HfieldAtPointSpherical(ind, :) =  calculateHfieldAtPointRWGCart(Const, [0, 0, r_obs(ind)], ...
-%                         Solver_setup, Solution.PO.Isol);
-% %                     HfieldAtPointSpherical(ind, :) =  calculateHfieldAtPointRWG(Const, r_obs(ind), 0, 0, ...
-% %                         Solver_setup, Solution.PO.Isol);
-%                 end
-%         
-%                 Hfield_magnitude = sqrt(abs(HfieldAtPointSpherical(:, 1)).^2 + ...
-%                     abs(HfieldAtPointSpherical(:,2)).^2 + ...
-%                     abs(HfieldAtPointSpherical(:, 3)).^2);
-%                 Hfield_magnitudedB = 20*log10(Hfield_magnitude);
-%         
-%                 figure;
-%                 plot(r_obs, Hfield_magnitudedB);
-%                 hold on
-%                 xlabel('Z/m');
-%                 ylabel('H/dBA/m');
-        
-        relError = calculateErrorNormttPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
+        relError = calculateErrorNormPercentage(xVectors.Isol(1:Solver_setup.num_metallic_edges,index), Solution.PO.Isol(:,1));
         message_fc(Const,sprintf('Rel. error norm. compared to reference sol. %f percent', relError));
         
         % Calculate now the magnitude of the E-field vector.
@@ -100,14 +84,3 @@ function r = getBoundingRadius(Solver_setup)
 vertices = double(Solver_setup.nodes_xyz);
 r = max(sqrt(sum(vertices.^2,2)));
 end
-
-
-
-
-
-
-
-
-
-
-
