@@ -48,3 +48,6 @@ examples/cruise_missile/Cruise_missile_new_SRPO.cfm
 examples/cruise_missile/Cruise_missile_new_SRPO.cfx
 examples/cruise_missile/Cruise_missile_MLFMM_bistatic.cfx
 examples/cruise_missile/Cruise_missile_MLFMM_bistatic.cfm
+src/POinterface/optix.6.5.0.dll
+src/POinterface/optix_prime.6.5.0.dll
+src/POinterface/optixu.6.5.0.dll
